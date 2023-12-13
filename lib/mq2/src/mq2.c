@@ -20,18 +20,21 @@ struct mq2_t {
         bool initialized;
     };
 
+
 static error_type_t mq2_init_analog_mode(mq2_t *mq2_object);
 static error_type_t mq2_init_digital_mode(mq2_t *mq2_object);
 
-mq2_t* mq2_create(const mq2_config config){
+mq2_t* mq2_create(const mq2_config_t* config){
+    if(config == NULL)return NULL;
     mq2_t* new_mq_2_obj = (mq2_t*) malloc(sizeof(mq2_t));
-    new_mq_2_obj->analog_pin_number = config.analog_pin_number;
-    new_mq_2_obj->digital_pin_number = config.digital_pin_number;
-    new_mq_2_obj->mode = config.mode;
+    new_mq_2_obj->analog_pin_number = config->analog_pin_number;
+    new_mq_2_obj->digital_pin_number = config->digital_pin_number;
+    new_mq_2_obj->mode = config->mode;
     return new_mq_2_obj;
 }
 
 static error_type_t mq2_init_analog_mode(mq2_t* mq2_object){
+    if(mq2_object == NULL)return NULL_PARAMETER;
     if(mq2_object->analog_pin_number <  MIN_ANALOG_PIN_NUMBER || mq2_object->analog_pin_number > MAX_ANALOG_PIN_NUMBER){
             return INVALID_PIN_NUMBER;
     }
@@ -40,6 +43,7 @@ static error_type_t mq2_init_analog_mode(mq2_t* mq2_object){
 }
 
 static error_type_t mq2_init_digital_mode(mq2_t* mq2_object){
+    if(mq2_object == NULL)return NULL_PARAMETER;
     if(mq2_object->analog_pin_number <  MIN_DIGITAL_PIN_NUMBER || mq2_object->analog_pin_number > MAX_DIGITAL_PIN_NUMBER){
             return INVALID_PIN_NUMBER;
     }
@@ -48,6 +52,7 @@ static error_type_t mq2_init_digital_mode(mq2_t* mq2_object){
     return OK;
 }
 error_type_t mq2_init(mq2_t* mq2_object){
+    if(mq2_object == NULL)return NULL_PARAMETER;
     if(mq2_object->mode == MQ2_ANALOG_ONLY)
     return mq2_init_analog_mode(mq2_object);
     else if(mq2_object->mode == MQ2_DIGITAL_ONLY)
@@ -64,6 +69,7 @@ error_type_t mq2_init(mq2_t* mq2_object){
 }
 
 error_type_t mq2_init_with_isr(mq2_t* mq2_object, void(*callback)()){
+    if(mq2_object == NULL)return NULL_PARAMETER;
     if(mq2_object->mode == MQ2_ANALOG_ONLY)return INVALID_PARAMETER;
     error_type_t err = mq2_init(mq2_object);
     if (err != OK)return err;

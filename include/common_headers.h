@@ -7,8 +7,10 @@ extern "C"
     typedef enum
     {
         OK,
+        NULL_PARAMETER,
         INVALID_PARAMETER,
         INVALID_PIN_NUMBER,
+        INVALID_STATE,
         FAILED
 
     } error_type_t;

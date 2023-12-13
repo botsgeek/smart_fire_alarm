@@ -34,7 +34,7 @@ extern "C"
         uint8_t analog_pin_number;
         uint8_t digital_pin_number;
         mq2_mode_t mode;
-    } mq2_config;
+    } mq2_config_t;
 
     /**
      * @brief
@@ -64,7 +64,7 @@ extern "C"
      * @param config
      * @return mq2_t*
      */
-    mq2_t *mq2_create(const mq2_config config);
+    mq2_t *mq2_create(const mq2_config_t *config);
 
 #ifdef __cplusplus
 }
