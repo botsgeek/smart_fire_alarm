@@ -1,62 +1,78 @@
-// lm75.c
-
+#include <Arduino.h>
 #include <Wire.h>
 #include "lm75.h"
-#include <Arduino.h>
 
-void initialize(TempI2C_LM75* lm75, uint8_t i2c_addr, Resolution resolution) {
+
+void lm75_init(lm75_config_t* lm75_config, uint8_t i2c_addr, lm75_resolution_t lm75_resolution) {
+    // Initialize the I2C communication
+    // Assuming Wire.begin() initializes the I2C library; replace it with your specific initialization code
     Wire.begin();
-    lm75->i2c_addr = i2c_addr;
-    configure(lm75, comparator_mode, one_sample, resolution, active_low);
-}
 
-void deinitialize(TempI2C_LM75* lm75) {
+    // Populate lm75_config structure with initialization parameters
+    lm75_config->i2c_addr = i2c_addr;
+    lm75_config->polarity = LM75_POLARITY_ACTIVE_LOW;  // Set an initial polarity (you can change this if needed)
+    lm75_config->tolerance = LM75_TOLERANCE_ONE_SAMPLE;  // Set an initial tolerance (you can change this if needed)
+    lm75_config->resolution = LM75_RESOLUTION_9_BITS;
+
+    // Configure LM75 based on the provided parameters
+    configure(lm75_config, LM75_COMPARATOR_MODE, LM75_TOLERANCE_ONE_SAMPLE, LM75_RESOLUTION_9_BITS, LM75_POLARITY_ACTIVE_LOW);
+}
+void lm75_deinit(lm75_config_t* lm75_config, uint8_t i2c_addr) {
     // Leave it blank if no specific cleanup is needed
 }
 
-void configure(TempI2C_LM75* lm75, ThermostatMode mode, ThermostatFaultTolerance fault_tolerance, Resolution resolution, OSPolarity polarity) {
-    CfgRegister regv;
-    regv.mbyte = 0;  // Initialize to 0 to set reserved bits to 0
 
-    regv.mbits.thermostat_mode = mode;
-    regv.mbits.thermostat_fault_tolerance = fault_tolerance;
-    regv.mbits.resolution = resolution;
-    regv.mbits.thermostat_output_polarity = polarity;
+void lm75_config(lm75_config_t* lm75_config, lm75_mode_t mode, lm75_tolerance_t fault_tolerance, lm75_resolution_t resolution, lm75_polarity_t polarity) {
+    lm75_CfgRegister  lm75_regv;
+     lm75_regv.mbyte = 0;  // Initialize to 0 to set reserved bits to 0
 
-    setReg(lm75, config_reg, regv.mbyte);
+    // Populate the lm75_CfgRegister structure with the provided parameters
+     lm75_regv.mbits.thermostat_mode = mode;
+     lm75_regv.mbits.thermostat_fault_tolerance = fault_tolerance;
+     lm75_regv.mbits.resolution = resolution;
+     lm75_regv.mbits.thermostat_output_polarity = polarity;
+
+    // Set the configuration register in the LM75
+    lm75_setReg(lm75_config, LM75_REGISTER_CONFIG,  lm75_regv.mbyte);
+
 }
 
-float readTemperature(TempI2C_LM75* lm75) {
-    union {
-        unsigned short tempX;
-        short tempS;
-    } temperature;
 
-    temperature.tempX = getReg(lm75, temp_reg);
-    return (temperature.tempS / 256.0F);
+float lm75_read(lm75_config_t* lm75_config)
+{
+    uint16_t tempX = lm75_getReg(lm75_config, LM75_REGISTER_TEMP);
+    int16_t tempS = (int16_t)tempX;  // Convert to signed int
+
+    float lm75_temp = (float)tempS / 256.0F;
+    return lm75_temp;
 }
 
-unsigned getReg(TempI2C_LM75* lm75, LM75Register reg) {
-    unsigned Result = 0xFFFF;
 
-    Wire.beginTransmission(lm75->i2c_addr);
-    Wire.write(reg);
+
+unsigned lm75_getReg(lm75_config_t* lm75_config, lm75_register_t lm75_reg)
+{
+    unsigned result = 0xFFFF;
+    Wire.beginTransmission(lm75_config->i2c_addr);
+    Wire.write((uint8_t)lm75_reg);
     Wire.endTransmission();
+    Wire.requestFrom(lm75_config->i2c_addr, (uint8_t)(lm75_reg == LM75_REGISTER_CONFIG ? 1 : 2));
 
-    Wire.requestFrom(lm75->i2c_addr, uint8_t(2));
-    if (Wire.available()) {
-        Result = Wire.read();
-        if (reg != config_reg) {
-            Result = (Result << 8) | Wire.read();
+    if (Wire.available())
+    {
+        result = Wire.read();
+        if (lm75_reg != LM75_REGISTER_CONFIG)
+        {
+            result = (result << 8) | Wire.read();
         }
     }
 
-    return Result;
+    return result;
 }
 
-void setReg(TempI2C_LM75* lm75, LM75Register reg, uint8_t newValue) {
-    Wire.beginTransmission(lm75->i2c_addr);
-    Wire.write(reg);
+void lm75_setReg(lm75_config_t* lm75_config, lm75_register_t lm75_reg, uint8_t newValue)
+{
+    Wire.beginTransmission(lm75_config->i2c_addr);
+    Wire.write((uint8_t)lm75_reg);
     Wire.write(newValue);
     Wire.endTransmission();
 }
