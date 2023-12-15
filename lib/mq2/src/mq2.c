@@ -91,7 +91,11 @@ error_type_t mq2_deinit(mq2_t* mq2_object){
     // Since arduino does not de-initialized pins
     // Nothing to do here than to free our object to
     // Release the memory
+    if(mq2_object){
     free(mq2_object);
+    }
+    return OK;
+}
     return OK;
 }
 
