@@ -96,10 +96,15 @@ error_type_t mq2_deinit(mq2_t* mq2_object){
     // Nothing to do here than to free our object to
     // Release the memory
     if(mq2_object){
-    free(mq2_object);
+        mq2_object->initialized = false;
+        if(mq2_object->has_isr){
+            detachInterrupt(mq2_object->digital_pin_number);
+        }
+        free(mq2_object);
     }
     return OK;
 }
+
 error_type_t mq2_analog_read(mq2_t *mq2_object, uint8_t *value_ptr){
     if(mq2_object == NULL || value_ptr == NULL)return NULL_PARAMETER;
     if(mq2_object->initialized != true) return INVALID_STATE;
