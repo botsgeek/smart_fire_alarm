@@ -13,33 +13,36 @@ void lm75_init(lm75_config_t* lm75_config, uint8_t i2c_addr, lm75_resolution_t l
     lm75_config->polarity = LM75_POLARITY_ACTIVE_LOW;  // Set an initial polarity (you can change this if needed)
     lm75_config->tolerance = LM75_TOLERANCE_ONE_SAMPLE;  // Set an initial tolerance (you can change this if needed)
     lm75_config->resolution = LM75_RESOLUTION_9_BITS;
-
+    lm75_config->configured = false;
     // Configure LM75 based on the provided parameters
-    configure(lm75_config, LM75_COMPARATOR_MODE, LM75_TOLERANCE_ONE_SAMPLE, LM75_RESOLUTION_9_BITS, LM75_POLARITY_ACTIVE_LOW);
+    lm75_configure(lm75_config, LM75_COMPARATOR_MODE, LM75_TOLERANCE_ONE_SAMPLE, LM75_RESOLUTION_9_BITS, LM75_POLARITY_ACTIVE_LOW);
 }
 void lm75_deinit(lm75_config_t* lm75_config, uint8_t i2c_addr) {
     // Leave it blank if no specific cleanup is needed
 }
 
 
-void lm75_config(lm75_config_t* lm75_config, lm75_mode_t mode, lm75_tolerance_t fault_tolerance, lm75_resolution_t resolution, lm75_polarity_t polarity) {
-    lm75_CfgRegister  lm75_regv;
-     lm75_regv.mbyte = 0;  // Initialize to 0 to set reserved bits to 0
+void lm75_configure(lm75_config_t* lm75_config, lm75_mode_t mode, lm75_tolerance_t fault_tolerance, lm75_resolution_t resolution, lm75_polarity_t polarity) {
+    lm75_CfgRegister lm75_regv;
+    lm75_regv.mbyte = 0;  // Initialize to 0 to set reserved bits to 0
 
     // Populate the lm75_CfgRegister structure with the provided parameters
-     lm75_regv.mbits.thermostat_mode = mode;
-     lm75_regv.mbits.thermostat_fault_tolerance = fault_tolerance;
-     lm75_regv.mbits.resolution = resolution;
-     lm75_regv.mbits.thermostat_output_polarity = polarity;
+    lm75_regv.mbits.thermostat_mode = mode;
+    lm75_regv.mbits.thermostat_fault_tolerance = fault_tolerance;
+    lm75_regv.mbits.resolution = resolution;
+    lm75_regv.mbits.thermostat_output_polarity = polarity;
 
     // Set the configuration register in the LM75
     lm75_setReg(lm75_config, LM75_REGISTER_CONFIG,  lm75_regv.mbyte);
-
+    lm75_config->configured = true;
 }
-
 
 float lm75_read(lm75_config_t* lm75_config)
 {
+     if (!lm75_config->configured) {
+        Serial.println("LM75 not configured. Please configure before reading temperature.");
+        return 0.0;  // Or any other appropriate value indicating an error
+    }
     uint16_t tempX = lm75_getReg(lm75_config, LM75_REGISTER_TEMP);
     int16_t tempS = (int16_t)tempX;  // Convert to signed int
 
