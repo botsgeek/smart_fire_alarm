@@ -72,9 +72,9 @@ error_type_t mq2_init(mq2_t* mq2_object){
 }
 
 error_type_t mq2_init_with_isr(mq2_t* mq2_object, void(*callback)()){
-    if(mq2_object == NULL)return NULL_PARAMETER;
-    if(mq2_object->mode == MQ2_ANALOG_ONLY)return INVALID_PARAMETER;
-    if(mq2_object->analog_pin_number <  MIN_DIGITAL_ISR_PIN_NUMBER || mq2_object->analog_pin_number > MAX_DIGITAL_ISR_PIN_NUMBER){
+    if(mq2_object == NULL || callback == NULL)return NULL_PARAMETER;
+    if(mq2_object->mode == MQ2_ANALOG_ONLY)return INVALID_MODE;
+    if(mq2_object->digital_pin_number <  MIN_DIGITAL_ISR_PIN_NUMBER || mq2_object->digital_pin_number > MAX_DIGITAL_ISR_PIN_NUMBER){
             return INVALID_PIN_NUMBER;
     }
     error_type_t err = mq2_init(mq2_object);
