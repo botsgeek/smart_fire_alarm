@@ -1,6 +1,6 @@
 #include <stdint.h>
 #if defined(ARDUINO) && ARDUINO >= 100
-#include "Arduino.h"
+#elif defined(ARDUINO)
 #else
 #include <stdio.h>
 #endif
@@ -76,6 +76,7 @@ typedef struct {
     } mbits;
 
     uint8_t mbyte;
+    
 } lm75_CfgRegister;
 
 
@@ -85,9 +86,11 @@ typedef struct
     lm75_polarity_t polarity;
     lm75_tolerance_t tolerance;
     lm75_resolution_t resolution;
+    bool configured;
 } lm75_config_t;
 
-void configure(lm75_config_t* lm75_config, lm75_mode_t mode, lm75_tolerance_t fault_tolerance, lm75_resolution_t resolution, lm75_polarity_t polarity);
+void lm75_configure(lm75_config_t* lm75_config, lm75_mode_t mode, lm75_tolerance_t fault_tolerance, lm75_resolution_t resolution, lm75_polarity_t polarity);
+
 
 void lm75_init(lm75_config_t* lm75_config, uint8_t i2c_addr, lm75_resolution_t lm75_resolution);
 void lm75_deinit(lm75_config_t* lm75_config, uint8_t i2c_addr);
@@ -98,5 +101,7 @@ unsigned lm75_getReg(lm75_config_t* lm75_config, lm75_register_t lm75_reg);
 void lm75_setReg(lm75_config_t* lm75_config, lm75_register_t lm75_reg, uint8_t newValue);
 #ifdef __cplusplus
 }
+
 #endif
+
 #endif
