@@ -96,6 +96,22 @@ error_type_t mq2_deinit(mq2_t* mq2_object){
     }
     return OK;
 }
+error_type_t mq2_analog_read(mq2_t *mq2_object, uint8_t *value_ptr){
+    if(mq2_object == NULL || value_ptr == NULL)return NULL_PARAMETER;
+    if(mq2_object->initialized == false) return INVALID_STATE;
+    if(!(mq2_object->mode == MQ2_ANALOG_ONLY || mq2_object->mode == MQ2_HYBRID )){
+        return INVALID_MODE;
+    }
+    *value_ptr = analogRead(mq2_object->analog_pin_number);
+    return OK;
+}
+error_type_t mq2_digital_read(mq2_t *mq2_object, uint8_t *value_ptr){
+    if(mq2_object == NULL || value_ptr == NULL)return NULL_PARAMETER;
+    if(mq2_object->initialized == false) return INVALID_STATE;
+    if(!(mq2_object->mode == MQ2_DIGITAL_ONLY || mq2_object->mode == MQ2_HYBRID )){
+        return INVALID_MODE;
+    }
+    *value_ptr = digitalRead(mq2_object->digital_pin_number);
     return OK;
 }
 
