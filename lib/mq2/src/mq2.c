@@ -64,7 +64,7 @@ error_type_t mq2_init(mq2_t* mq2_object){
         error_type_t analog_err = mq2_init_analog_mode(mq2_object);
         if (analog_err != OK) return analog_err;
         error_type_t digital_err = mq2_init_digital_mode(mq2_object);
-        if (digital_err != OK) return analog_err;
+        if (digital_err != OK) return digital_err;
         mq2_object->initialized = true;
         return OK;
     }
