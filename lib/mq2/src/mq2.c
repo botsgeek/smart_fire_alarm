@@ -32,6 +32,7 @@ mq2_t* mq2_create(const mq2_config_t* config){
     new_mq_2_obj->analog_pin_number = config->analog_pin_number;
     new_mq_2_obj->digital_pin_number = config->digital_pin_number;
     new_mq_2_obj->mode = config->mode;
+    new_mq_2_obj->initialized = false;
     return new_mq_2_obj;
 }
 
