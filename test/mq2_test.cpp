@@ -183,7 +183,7 @@ void test_init_with_isr_correct_configs(void)
 void test_analog_read(void)
 {
   // more test stuff
-  uint8_t sensor_value;
+  uint16_t sensor_value;
   mq2_config_t config = {
       .analog_pin_number = A7,
       .digital_pin_number = 0,
@@ -217,7 +217,7 @@ void test_analog_read(void)
 void test_digital_read(void)
 {
   // more test stuff
-  uint8_t sensor_value;
+  uint16_t sensor_value;
   mq2_config_t config = {
       .analog_pin_number = 30,
       .digital_pin_number = 2,
@@ -260,7 +260,7 @@ void test_deinit(void)
   error_type_t err = mq2_init(my_mq);
   TEST_ASSERT_EQUAL(OK, err);
   mq2_deinit(my_mq);
-  uint8_t sensor_value;
+  uint16_t sensor_value;
   err = mq2_digital_read(my_mq, &sensor_value);
   TEST_ASSERT_EQUAL(INVALID_STATE, err);
 }

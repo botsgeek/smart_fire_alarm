@@ -66,8 +66,8 @@ extern "C"
      */
     mq2_t *mq2_create(const mq2_config_t *config);
 
-    error_type_t mq2_analog_read(mq2_t *mq2_object, uint8_t *value_ptr);
-    error_type_t mq2_digital_read(mq2_t *mq2_object, uint8_t *value_ptr);
+    error_type_t mq2_analog_read(mq2_t *mq2_object, uint16_t *value_ptr);
+    error_type_t mq2_digital_read(mq2_t *mq2_object, uint16_t *value_ptr);
 
 #ifdef __cplusplus
 }
