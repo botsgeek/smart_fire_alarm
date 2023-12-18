@@ -1,82 +1,48 @@
 #include <Arduino.h>
 #include "fan-driver.h"
+#include "common_headers.h"
 #include <stdbool.h>
 
-int fanspeed ;
+#define FAN_PIN_NUMBER A5
 
-void activate_fan(){
-    int fan_pin = 5;
-    fan_state fan_operation = INITIALIZE_FAN;
-    // fan_operation = FAN_SPEED;
-    // fan_operation = DEACTIVATE_FAN;
-
+struct fan_t
+{
     
-    switch (fan_operation)
-    {
-    case INITIALIZE_FAN:
-  
-    
-        for ( fanspeed = 0; fanspeed <= 125; fanspeed++)
-        {
-            analogWrite(fan_pin, fanspeed);
-        }
-        // //delay(10);
-        break;
-    case FAN_SPEED:
-    for (fanspeed = 125; fanspeed <= 255; fanspeed++)
-    {
-        analogWrite(fan_pin, fanspeed);
-    }
-    
-    delay(10);
-    break;
-    case DEACTIVATE_FAN:
-    for ( fanspeed= 255;  fanspeed<= 0; fanspeed--)
-    {
-         analogWrite(fan_pin, fanspeed);
-    }
-    delay(10);
-    
-   
-    break; 
-    default:
-        break;
-    }
+    fan_mode_t set_fanspeed;
+    bool activate;
     
 
+};
 
+fan_t* fan_driver_create(const fan_state_t* fan_operation){
+    if(fan_operation == NULL)
+    return NULL;
+    fan_t* new_fan_mode = (fan_t*)malloc(sizeof(fan_t));
+    new_fan_mode->set_fanspeed = fan_operation->set_fanspeed;
+    new_fan_mode->activate = true;      
 }
 
+error_type_t fan_init(fan_t* fan_object){
+    if (fan_object == NULL)
+    return NULL_PARAMETER;
 
-void validate_before_activating(){
-    int fan_pin =5;
-    bool activation ;
-
-    if (fanspeed > 255)
-    {
-        activation = false;
-        // printf("Warning fan can't start.\n Error occure when receiving signal.");
+    if(fan_object->set_fanspeed > 125){
+    return INVALID_STATE;
     }
-    else
-    {
-        activation = true;
-    }
-
-    if (activation == false){
-        fanspeed = 0;
-        analogWrite(fan_pin, fanspeed);
-        //Serial.println("fan is active");
-    }
-    else
-    {
-        for ( fanspeed = 125; fanspeed <= 255; fanspeed++)
-        {
-            analogWrite(fan_pin, fanspeed);
-        }
-        delay(10);
-    }
-    
-
-    
-    
+    fan_object->activate = false;   
 }
+
+error_type_t set_fanspeed(fan_t* fan_object){
+    if(fan_object == NULL)
+    return NULL_PARAMETER;
+
+    if (fan_object->set_fanspeed > 255)
+    {
+        return INVALID_STATE;
+    }
+    fan_object->activate =false;
+}
+
+// error_type_t deinit(fan_t* fan_object){
+
+// }
