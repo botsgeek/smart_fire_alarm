@@ -7,42 +7,50 @@
 
 struct fan_t
 {
-    
-    fan_mode_t set_fanspeed;
-    bool activate;
+    uint8_t fan_pin_number;
+    bool activated;
     
 
 };
 
-fan_t* fan_driver_create(const fan_state_t* fan_operation){
-    if(fan_operation == NULL)
+fan_t* fan_create(const fan_config_t* config){
+    if(config == NULL)
     return NULL;
-    fan_t* new_fan_mode = (fan_t*)malloc(sizeof(fan_t));
-    new_fan_mode->set_fanspeed = fan_operation->set_fanspeed;
-    new_fan_mode->activate = true;      
+    fan_t* fan_obj= (fan_t*)malloc(sizeof(fan_t));
+    fan_obj->fan_pin_number = config->fan_pin_number;
+    fan_obj->activated = false;
+    return fan_obj;    
 }
-
 error_type_t fan_init(fan_t* fan_object){
-    if (fan_object == NULL)
-    return NULL_PARAMETER;
-
-    if(fan_object->set_fanspeed > 125){
-    return INVALID_STATE;
-    }
-    fan_object->activate = false;   
-}
-
-error_type_t set_fanspeed(fan_t* fan_object){
     if(fan_object == NULL)
     return NULL_PARAMETER;
-
-    if (fan_object->set_fanspeed > 255)
+    if (fan_object->fan_pin_number != FAN_PIN_NUMBER)
+    {
+        return INVALID_PIN_NUMBER;
+    }
+    pinMode(fan_object->fan_pin_number,OUTPUT);
+    fan_object->activated = true;
+    return OK;   
+}
+error_type_t set_fanspeed(fan_t* fan_object){
+    uint8_t fanspeed = 255;
+    if(fan_object == NULL)
+    return NULL_PARAMETER;
+    if (fan_object->activated != true)
     {
         return INVALID_STATE;
     }
-    fan_object->activate =false;
+
+    analogWrite(fan_object->fan_pin_number, fanspeed);
+    return OK;
+}
+error_type_t deinit(fan_t* fan_object){
+    if(fan_object){
+        fan_object->activated = false;
+       
+    }
+    free(fan_object);
+    return OK;
 }
 
-// error_type_t deinit(fan_t* fan_object){
 
-// }
