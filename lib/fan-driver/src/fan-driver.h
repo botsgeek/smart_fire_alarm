@@ -15,7 +15,7 @@ typedef struct{
 
 error_type_t fan_init(fan_t* fan_object);
 
-error_type_t set_fanspeed(fan_t* fan_object);
+error_type_t set_fanspeed(fan_t* fan_object, uint8_t fanspeed);
 
 error_type_t deinit(fan_t* fan_object);
 

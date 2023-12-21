@@ -42,7 +42,7 @@ error_type_t fan_init(fan_t* fan_object){
     return OK; 
    
 }
-error_type_t set_fanspeed(fan_t* fan_object){
+error_type_t set_fanspeed(fan_t* fan_object,  uint8_t fanspeed){
     if(fan_object == NULL)
     return NULL_PARAMETER;
     if (fan_object->activated != true)
@@ -50,7 +50,7 @@ error_type_t set_fanspeed(fan_t* fan_object){
         //  Serial.println("/ fan_ speed is sucessful ");
         return INVALID_STATE;
     }
-      uint8_t fanspeed = 255;
+      
     analogWrite(fan_object->fan_pin_number, fanspeed);
     
     return OK;
@@ -59,9 +59,9 @@ error_type_t set_fanspeed(fan_t* fan_object){
 error_type_t deinit(fan_t* fan_object){
     if(fan_object){
         fan_object->activated = false;
+        free(fan_object);
        
     }
-    free(fan_object);
     // Serial.println("/ fan_ deinit is sucessful ");
     return OK;
 }
