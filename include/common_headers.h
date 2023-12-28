@@ -8,12 +8,15 @@ extern "C"
     typedef enum
     {
         OK,
+        ON,
+        OFF,
         NULL_PARAMETER,
         INVALID_PARAMETER,
         INVALID_PIN_NUMBER,
         INVALID_STATE,
         INVALID_MODE,
         FAILED
+        
 
     } error_type_t;
 #ifdef __cplusplus
