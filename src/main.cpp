@@ -1,62 +1,48 @@
 #include <Arduino.h>
-#include "lm75.h"
+#include "buzzer.h"
 
-// Declare lm75_config as a global variable
-lm75_config_t lm75_config = {
-    .i2c_addr = 0x48,
-    .mode = LM75_COMPARATOR_MODE,
-    .os_pin_number = 2,
-    .polarity = LM75_POLARITY_ACTIVE_LOW,
-    .tolerance = LM75_TOLERANCE_ONE_SAMPLE,
-    .resolution = LM75_RESOLUTION_12_BITS
-};
+#define BUZZER_PIN 5  // Replace with your actual buzzer pin
+#define PWM_DUTY_CYCLE 200  // Adjust the PWM duty cycle as needed
+#define DELAY_BETWEEN_TONES 100  // Adjust the delay between waves as needed
+#define DELAY_BETWEEN_WAVE 5000
+buzzer_t* myBuzzer;
 
-// Declare lm75_object as a global variable
-lm75_t* lm75_object;
-
+const unsigned int toneDutyCycles[] = {128, 150, 180, 200};
 void setup() {
-    Serial.begin(9600);  // Initialize Serial communication
+    buzzer_config_t buzzerConfig = {.buzzer_pin = BUZZER_PIN};
+    myBuzzer = buzzer_create(&buzzerConfig);
 
-    // Initialize LM75
-    lm75_object = lm75_create(&lm75_config);
-    if (lm75_object == NULL) {
-        // Handle memory allocation error
-        return;
+    if (myBuzzer != NULL) {
+        buzzer_init(myBuzzer);
+        // Other setup code if needed
+    } else {
+        // Handle error if object creation fails
     }
-
-    error_type_t init_result = lm75_init_comparator_mode(lm75_object);
-    if (init_result != OK) {
-        // Handle initialization error
-        free(lm75_object);
-        return;
-    }
-
-    // Set thresholds for Comparator Mode
-    lm75_set_thresholds(lm75_object, 25.0, 26.0);  // Set hysteresis and overtemperature thresholds
 }
 
+// void loop() {
+//     // Start the buzzer with the specified PWM duty cycle
+//     buzzer_start(myBuzzer, PWM_DUTY_CYCLE);
+
+//     delay(DELAY_BETWEEN_WAVE);
+
+//     // Stop the buzzer
+//     buzzer_stop(myBuzzer);
+
+//     //delay(DELAY_BETWEEN_WAVE);
+// }
+
 void loop() {
-    // Read temperature
-    float temp_value = lm75_read(lm75_object);
+    // Iterate through the array of duty cycles to play different tones
+    for (unsigned int i = 0; i < sizeof(toneDutyCycles) / sizeof(toneDutyCycles[0]); ++i) {
+        // Start the buzzer with the current duty cycle
+        buzzer_start(myBuzzer, toneDutyCycles[i]);
 
-    // Check if lm75_object is not NULL before accessing its members
-    if (lm75_object != NULL) {
-        Serial.print("Raw Temperature Register Value: ");
-        unsigned temp_register = lm75_getReg(lm75_object, LM75_REGISTER_TEMP);
-        Serial.println(temp_register);
+        delay(DELAY_BETWEEN_TONES);
 
-        Serial.print("Temperature: ");
-        Serial.print(temp_value);
-        Serial.println(" °C");
+        // Stop the buzzer
+        buzzer_stop(myBuzzer);
 
-        // Check if the temperature is above the set threshold
-        if (temp_value > 26.0) {
-            Serial.print("Temperature is above threshold! ");
-            Serial.println(temp_value);
-        }
+        //delay(DELAY_BETWEEN_WAVE);
     }
-
-    // Delay for 2 seconds
-    delay(2000);
-    // Your main loop code here
 }
