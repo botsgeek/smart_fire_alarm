@@ -3,6 +3,7 @@
 #include "lm75.h"
 #include "common_headers.h"
 
+
 struct lm75_t {
         uint8_t i2c_addr;
         uint8_t os_pin_number;

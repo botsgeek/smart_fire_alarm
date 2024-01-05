@@ -87,8 +87,7 @@ extern "C"
     void lm75_set_thresholds(lm75_t* lm75_object, float threshold_hyst, float threshold_os);
     void lm75_interrupt_handler();
     error_type_t lm75_init_comparator_mode(lm75_t* lm75_object);
-
- error_type_t lm75_init_interrupt_mode(lm75_t* lm75_object,void(*lm75_interrupt_handler)());
+    error_type_t lm75_init_interrupt_mode(lm75_t* lm75_object,void(*lm75_interrupt_handler)());
 
 
 }

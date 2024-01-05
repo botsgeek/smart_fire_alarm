@@ -18,6 +18,7 @@
 struct mq2_t {
         uint8_t analog_pin_number;
         uint8_t digital_pin_number;
+
         mq2_mode_t mode;
         bool initialized;
         bool has_isr;
