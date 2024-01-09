@@ -13,7 +13,6 @@ extern "C"
         INVALID_PIN_NUMBER,
         INVALID_STATE,
         INVALID_MODE,
-        INVALID_TEMPERATURE,
         FAILED
 
     } error_type_t;
