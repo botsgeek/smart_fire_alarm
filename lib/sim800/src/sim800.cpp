@@ -16,6 +16,7 @@ static const uint8_t ACCEPTABLE_RX_PIN[] = {0, 1, 2, 3};
 #define READ_BUFFER_SIZE (256U)
 #define EXTRA_CHAR_COUNT (2U)
 #define MESSAGE_SEND_BUFFER_SIZE (255U)
+#define SEND_SMS_DELAY (60000U)
 #define COMMAND_PING ("AT\r\n")
 #define COMMAND_CHECK_SMS_SUPPORT ("AT+CMGF=1\r\n")
 #define COMMAND_CONSTRUCT_SMS_NUMBER(x, y) \
@@ -304,7 +305,7 @@ error_type_t sim800_send_sms(sim800_t *sim800_object, char *phone_number, char *
     COMMAND_CONSTRUCT_SMS(sms_command_with_number, message, sms_term);
     Serial.println("constructed message is: ");
     Serial.println((String)sms_command_with_number);
-    err = write_and_read(sms_command_with_number, 60000);
+    err = write_and_read(sms_command_with_number, SEND_SMS_DELAY);
     if (err != OK)
     {
         Serial.println("SMS send failed");
