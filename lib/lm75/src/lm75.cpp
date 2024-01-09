@@ -3,7 +3,6 @@
 #include "lm75.h"
 #include "common_headers.h"
 
-
 struct lm75_t {
         uint8_t i2c_addr;
         uint8_t os_pin_number;
@@ -41,6 +40,7 @@ lm75_t* lm75_create(const lm75_config_t* config){
     if(lm75_object == NULL)return INVALID_PARAMETER;
     attachInterrupt(digitalPinToInterrupt(lm75_object->os_pin_number), lm75_interrupt_handler, FALLING);
     lm75_object->initialized = true;
+    lm75_object->has_isr = true;
     Wire.begin();
     return OK;
 }
@@ -61,7 +61,7 @@ float lm75_read(lm75_t* lm75_object) {
         // Handle uninitialized object or other error conditions
         return INVALID_TEMPERATURE;
     }
-    // Read temperature from the LM75 sensor and convert to Celsius
+    // Read temperature from the LM75 sensor
     unsigned temp_register = lm75_getReg(lm75_object, LM75_REGISTER_TEMP);
 
     // Perform sign extension for 16-bit value
