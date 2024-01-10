@@ -9,22 +9,13 @@
 
 
 
-//#define BUZZER_PIN 8 // Change this to your actual pin
+
  struct buzzer_t{
     uint8_t buzzer_pin;
     bool activated;
     };
 
-// buzzer_t* buzzer_create(const buzzer_config_t* config){
-//     if(config == NULL) return NULL;
-//     buzzer_t* buzzer_obj = (buzzer_t*) malloc(sizeof(buzzer_t));
-//     buzzer_obj->buzzer_pin = config-> buzzer_pin;
-//     buzzer_obj->activated = false;
-//     return buzzer_obj;
-// }
-
     buzzer_t* buzzer_create(const uint8_t buzzer_pin){
-    // if(buzzer_pin == NULL) return NULL;
     buzzer_t* buzzer_obj = (buzzer_t*) malloc(sizeof(buzzer_t));
     buzzer_obj->buzzer_pin = buzzer_pin;
     buzzer_obj->activated = false;
