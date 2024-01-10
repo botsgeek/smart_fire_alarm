@@ -8,8 +8,6 @@
 #define MIN_BUZZER_PIN 2
 
 
-
-
  struct buzzer_t{
     uint8_t buzzer_pin;
     bool activated;
@@ -72,4 +70,29 @@ error_type_t buzzer_stop(buzzer_t* buzzer_object) {
     
         analogWrite(buzzer_object->buzzer_pin, 0);
         return OK;
+}
+
+error_type_t buzzer_tone(buzzer_t* buzzer_object, unsigned int pwm_duty_cycle, unsigned int sound_duration, unsigned int silence_period) {
+    if (buzzer_object == NULL) {
+        return NULL_PARAMETER;
+    }
+    if (buzzer_object->buzzer_pin < MIN_BUZZER_PIN || buzzer_object->buzzer_pin > MAX_BUZZER_PIN) {
+        return INVALID_PIN_NUMBER;
+    }
+    if (!buzzer_object->activated) {
+        return INVALID_STATE;
+    }
+
+    unsigned long start_time = millis();
+    while (millis() - start_time < sound_duration) {
+        buzzer_start(buzzer_object, pwm_duty_cycle);  // Adjust the duty cycle as needed
+    }
+
+   
+
+    buzzer_stop(buzzer_object);
+
+    delay(silence_period);
+
+    return OK;
 }
