@@ -73,6 +73,7 @@ static error_type_t validate_rx(sim800_t *sim800_object)
     }
     return pin_found == false ? INVALID_PIN_NUMBER : OK;
 }
+
 static error_type_t validate_baud(sim800_t *sim800_object)
 {
     bool baud_found = false;
@@ -210,7 +211,7 @@ error_type_t sim800_init(sim800_t *sim800_object)
 {
     if (sim800_object == NULL)
         return NULL_PARAMETER;
-    if (sim800_object->tx_pin_number < MIN_DIGITAL_PIN_NUMBER || sim800_object->rx_pin_number > MAX_DIGITAL_PIN_NUMBER)
+    if (sim800_object->tx_pin_number < MIN_DIGITAL_PIN_NUMBER || sim800_object->tx_pin_number > MAX_DIGITAL_PIN_NUMBER)
     {
         return INVALID_PIN_NUMBER;
     }
