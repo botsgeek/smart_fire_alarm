@@ -16,7 +16,7 @@ extern "C"
     error_type_t buzzer_deinit(buzzer_t* buzzer_object);
     error_type_t buzzer_start(buzzer_t* buzzer_object, uint8_t pwm_duty_cycle);
     error_type_t buzzer_stop(buzzer_t* buzzer_object);
-    error_type_t buzzer_tone(buzzer_t* buzzer_object, unsigned int sound_duration, unsigned int silence_period, unsigned long long total_time);
+    error_type_t buzzer_tone(buzzer_t* buzzer_object, unsigned int tone_duration, unsigned long long total_time);
     buzzer_t* buzzer_create(const uint8_t buzzer_pin);
 #ifdef __cplusplus
 }
