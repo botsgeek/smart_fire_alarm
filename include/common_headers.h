@@ -13,6 +13,11 @@ extern "C"
         INVALID_PIN_NUMBER,
         INVALID_STATE,
         INVALID_MODE,
+        INVALID_BAUD_RATE,
+        INVALID_LENGTH,
+        TIMED_OUT,
+        BUFFER_OVERFLOW,
+        UNKNOWN,
         FAILED
 
     } error_type_t;
