@@ -6,7 +6,7 @@
 
 #define MAX_BUZZER_PIN 13
 #define MIN_BUZZER_PIN 2
-const uint8_t pwm_duty_cycle = 255;
+static const uint8_t pwm_duty_cycle = 255;
 
  struct buzzer_t{
     uint8_t buzzer_pin;
@@ -73,7 +73,7 @@ error_type_t buzzer_stop(buzzer_t* buzzer_object) {
 }
 
 
-error_type_t buzzer_tone(buzzer_t* buzzer_object, unsigned int sound_duration, unsigned int silence_period, unsigned long long total_time) {
+error_type_t buzzer_tone(buzzer_t* buzzer_object, unsigned int tone_duration, unsigned long long total_time) {
     if (buzzer_object == NULL) {
         return NULL_PARAMETER;
     }
@@ -91,12 +91,12 @@ error_type_t buzzer_tone(buzzer_t* buzzer_object, unsigned int sound_duration, u
     unsigned long silence_start_time = start_time;
 
     while ((current_time = millis()) - start_time < total_time) {
-        if (is_sound_active && current_time - sound_start_time >= sound_duration) {
+        if ((is_sound_active ) && (current_time - sound_start_time >= tone_duration)) {
             is_sound_active = false;
             silence_start_time = current_time;
         }
 
-        if (!is_sound_active && current_time - silence_start_time >= silence_period) {
+        if ((!is_sound_active) && (current_time - silence_start_time >= tone_duration)) {
             is_sound_active = true;
             sound_start_time = current_time;
         }
