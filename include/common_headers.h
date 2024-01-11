@@ -8,8 +8,6 @@ extern "C"
     typedef enum
     {
         OK,
-        ON,
-        OFF,
         NULL_PARAMETER,
         INVALID_PARAMETER,
         INVALID_PIN_NUMBER,
