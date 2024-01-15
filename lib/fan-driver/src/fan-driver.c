@@ -3,7 +3,7 @@
 #include "common_headers.h"
 #include <stdbool.h>
 
-#define FAN_PIN_NUMBER A5
+#define FAN_PIN_NUMBER 5
 
 
 struct fan_t
