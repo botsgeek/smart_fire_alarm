@@ -13,6 +13,12 @@ extern "C"
 {
 #endif
 #include "common_headers.h"
+
+    typedef enum
+    {
+        NO_SMOKE,
+        SMOKE_DETECTED,
+    } mq2_state_t;
     typedef enum
     {
         MQ2_DIGITAL_ONLY,
