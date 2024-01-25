@@ -85,7 +85,7 @@ error_type_t mq2_init_with_isr(mq2_t* mq2_object, void(*callback)()){
         mq2_object->initialized = false;
         return INVALID_PARAMETER;
     }
-    attachInterrupt(digitalPinToInterrupt(mq2_object->digital_pin_number), callback, RISING);
+    attachInterrupt(digitalPinToInterrupt(mq2_object->digital_pin_number), callback, CHANGE);
     mq2_object->initialized = true;
     mq2_object->has_isr = true;
     return OK;

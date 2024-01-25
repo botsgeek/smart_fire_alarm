@@ -5,6 +5,7 @@ extern "C"
 {
 #endif
 #define SENSOR_INVALID_VALUE (-1)
+
     typedef enum
     {
         OK,
@@ -18,7 +19,8 @@ extern "C"
         TIMED_OUT,
         BUFFER_OVERFLOW,
         UNKNOWN,
-        FAILED
+        FAILED,
+        INVALID_TEMPERATURE,
 
     } error_type_t;
 #ifdef __cplusplus
