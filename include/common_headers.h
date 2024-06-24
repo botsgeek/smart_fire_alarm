@@ -18,7 +18,8 @@ extern "C"
         TIMED_OUT,
         BUFFER_OVERFLOW,
         UNKNOWN,
-        FAILED
+        FAILED,
+        INVALID_TEMPERATURE
 
     } error_type_t;
 #ifdef __cplusplus
