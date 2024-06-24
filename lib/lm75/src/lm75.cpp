@@ -1,5 +1,6 @@
 #include <Arduino.h>
 #include <Wire.h>
+#include <stdbool.h>
 #include "lm75.h"
 #include "common_headers.h"
 
@@ -56,7 +57,7 @@ error_type_t lm75_deinit(lm75_t* lm75_object){
     return OK;
 }
 
-float lm75_read(lm75_t* lm75_object) {
+error_type_t lm75_read(lm75_t* lm75_object, float* data) {
     if (lm75_object == NULL || !lm75_object->initialized) {
         // Handle uninitialized object or other error conditions
         return INVALID_TEMPERATURE;
@@ -74,9 +75,12 @@ float lm75_read(lm75_t* lm75_object) {
 
     // Convert to Celsius
     float temperatureCelsius = temperature / 256.0;
+
+    *data = temperatureCelsius;
+    Serial.printf("temperature celcius is %f\n",*data);
   
 
-    return temperatureCelsius;
+    return OK;
 }
 
 
