@@ -80,7 +80,7 @@ extern "C"
     error_type_t lm75_init(lm75_t *lm75_object);
     error_type_t lm75_deinit(lm75_t *lm75_object);
     lm75_t *lm75_create(const lm75_config_t *config);
-    float lm75_read(lm75_t *lm75_object);
+    error_type_t lm75_read(lm75_t *lm75_object, float* data);
     unsigned lm75_getReg(lm75_t *lm75_object, lm75_register_t lm75_reg);
     void lm75_setReg(lm75_t *lm75_object, lm75_register_t lm75_reg, uint8_t newValue);
 
@@ -88,7 +88,7 @@ extern "C"
     void lm75_interrupt_handler();
     error_type_t lm75_init_comparator_mode(lm75_t* lm75_object);
 
- error_type_t lm75_init_interrupt_mode(lm75_t* lm75_object,void(*lm75_interrupt_handler)());
+    error_type_t lm75_init_interrupt_mode(lm75_t* lm75_object,void(*lm75_interrupt_handler)());
 
 
 }
