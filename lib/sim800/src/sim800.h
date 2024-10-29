@@ -27,6 +27,7 @@ extern "C"
     {
         uint8_t tx_pin_number;
         uint8_t rx_pin_number;
+        uint8_t rst_pin_number;
         uint32_t baud_rate;
     } sim800_config_t;
 
@@ -67,6 +68,8 @@ extern "C"
      * @return error_type_t
      */
     error_type_t sim800_connect(sim800_t *sim800_object);
+    error_type_t sim800_reset(sim800_t* sim800_object);
+    error_type_t Validate_rst(sim800_t* sim800_object);
 
 #ifdef __cplusplus
 }
