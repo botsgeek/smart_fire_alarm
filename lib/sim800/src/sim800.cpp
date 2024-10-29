@@ -1,7 +1,7 @@
 #include "sim800.h"
 #include <SoftwareSerial.h>
 #include <stdlib.h>
-#include <Regexp.h>
+// #include <Regexp.h>
 #include "common_headers.h"
 #if defined(ARDUINO_AVR_NANO)
 #define MAX_DIGITAL_PIN_NUMBER (13)
@@ -60,6 +60,7 @@ struct sim800_t
 {
     uint8_t tx_pin_number;
     uint8_t rx_pin_number;
+    uint8_t rst_pin_number;
     uint32_t baud_rate;
     bool initialized;
 };
@@ -221,7 +222,7 @@ error_type_t sim800_init(sim800_t *sim800_object)
     err = validate_baud(sim800_object);
     if (err != OK)
         return err;
-    sim800_serial.serial = new SoftwareSerial(sim800_object->rx_pin_number, sim800_object->tx_pin_number);
+    sim800_serial.serial = new SoftwareSerial(sim800_object->rx_pin_number, sim800_object->tx_pin_number, sim800_object->rst_pin_number);
     sim800_serial.serial->begin(sim800_object->baud_rate);
     memset(sim800_read_buffer, 0, READ_BUFFER_SIZE);
     sim800_serial.response = sim800_read_buffer;
@@ -314,3 +315,26 @@ error_type_t sim800_send_sms(sim800_t *sim800_object, char *phone_number, char *
     }
     return OK;
 }
+
+error_type_t Validate_rst(sim800_t* sim800_object){
+    if (sim800_object->rst_pin_number > MIN_DIGITAL_PIN_NUMBER)
+    {
+        return INVALID_PIN_NUMBER;
+    }
+    pinMode(sim800_object->rst_pin_number, OUTPUT);
+    sim800_object->initialized = true;
+    return OK;
+}
+
+error_type_t sim800_reset(sim800_t* sim800_object){
+    if (!sim800_object->initialized)
+    {
+        return INVALID_STATE;
+    }
+    digitalWrite(sim800_object->rst_pin_number, LOW);
+    delay(2000);
+    digitalWrite(sim800_object->rst_pin_number, HIGH);
+    delay(2000);    
+    return OK;
+}
+
