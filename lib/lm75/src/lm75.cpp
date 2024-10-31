@@ -55,6 +55,12 @@ error_type_t lm75_deinit(lm75_t* lm75_object){
     }
     return OK;
 }
+error_type_t lm75_destroy(lm75_t** lm75_object){
+    if(lm75_object == NULL)return NULL_PARAMETER;
+        free(*lm75_object);
+    
+    return OK;
+}
 
 float lm75_read(lm75_t* lm75_object) {
     if (lm75_object == NULL || !lm75_object->initialized) {

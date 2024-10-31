@@ -53,7 +53,14 @@ error_type_t set_fanspeed(fan_t* fan_object,  uint8_t fanspeed){
     return OK;
     
 }
+error_type_t destroy(fan_t** fan_object){
+    if(fan_object == NULL)return NULL_PARAMETER;
+    free(*fan_object);
+    return OK;
+}
+
 error_type_t deinit(fan_t* fan_object){
+    if(fan_object == NULL)return NULL_PARAMETER;
     if(fan_object){
         fan_object->activated = false;
         free(fan_object);
@@ -62,5 +69,7 @@ error_type_t deinit(fan_t* fan_object){
    
     return OK;
 }
+
+
 
 

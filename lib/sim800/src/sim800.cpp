@@ -86,6 +86,7 @@ static error_type_t validate_baud(sim800_t *sim800_object)
     return baud_found == false ? INVALID_PIN_NUMBER : OK;
 }
 
+
 static void flush_serial()
 {
     if (sim800_serial.serial == nullptr)
@@ -117,7 +118,7 @@ static error_type_t read(uint32_t timeout = MAX_TIMEOUT, const char *terminating
             if (sim800_serial.response_length >= READ_BUFFER_SIZE)
                 break;
             sim800_read_buffer[sim800_serial.response_length] = sim800_serial.serial->read();
-            // Serial.println("read serial: " + (String)sim800_read_buffer[sim800_serial.response_length]);
+           // Serial.println("read serial: " + (String)sim800_read_buffer[sim800_serial.response_length]);
             if (strlen(terminating_string))
             {
                 if (sim800_serial.response_length > length_of_terminating_string)
@@ -221,11 +222,12 @@ error_type_t sim800_init(sim800_t *sim800_object)
         return err;
     err = validate_baud(sim800_object);
     if (err != OK)
-        return err;
-    sim800_serial.serial = new SoftwareSerial(sim800_object->rx_pin_number, sim800_object->tx_pin_number, sim800_object->rst_pin_number);
+        return err;  
+    sim800_serial.serial = new SoftwareSerial(sim800_object->rx_pin_number, sim800_object->tx_pin_number);
     sim800_serial.serial->begin(sim800_object->baud_rate);
     memset(sim800_read_buffer, 0, READ_BUFFER_SIZE);
     sim800_serial.response = sim800_read_buffer;
+    digitalWrite(sim800_object->rst_pin_number,LOW);
     sim800_object->initialized = true;
     flush_serial();
     return OK;
@@ -242,13 +244,18 @@ error_type_t sim800_deinit(sim800_t *sim800_object)
 }
 sim800_t *sim800_create(const sim800_config_t *config)
 {
+    // Serial.println("inside create");
     if (config == NULL)
         return NULL;
+
     sim800_t *new_sim800_obj = (sim800_t *)malloc(sizeof(sim800_t));
+    // Serial.println("malloc success");
     new_sim800_obj->tx_pin_number = config->tx_pin_number;
     new_sim800_obj->rx_pin_number = config->rx_pin_number;
+    new_sim800_obj->rst_pin_number = config->rst_pin_number;
     new_sim800_obj->baud_rate = config->baud_rate;
     new_sim800_obj->initialized = false;
+    // Serial.println("created object sim800");
     return new_sim800_obj;
 }
 
@@ -316,25 +323,15 @@ error_type_t sim800_send_sms(sim800_t *sim800_object, char *phone_number, char *
     return OK;
 }
 
-error_type_t Validate_rst(sim800_t* sim800_object){
-    if (sim800_object->rst_pin_number > MIN_DIGITAL_PIN_NUMBER)
-    {
-        return INVALID_PIN_NUMBER;
-    }
-    pinMode(sim800_object->rst_pin_number, OUTPUT);
-    sim800_object->initialized = true;
-    return OK;
-}
-
 error_type_t sim800_reset(sim800_t* sim800_object){
     if (!sim800_object->initialized)
     {
+        Serial.println("sim800 could not reset");
         return INVALID_STATE;
     }
-    digitalWrite(sim800_object->rst_pin_number, LOW);
-    delay(2000);
     digitalWrite(sim800_object->rst_pin_number, HIGH);
-    delay(2000);    
+    delay(2000);
+    digitalWrite(sim800_object->rst_pin_number, LOW);   
     return OK;
 }
 

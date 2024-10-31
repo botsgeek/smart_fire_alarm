@@ -69,7 +69,6 @@ extern "C"
      */
     error_type_t sim800_connect(sim800_t *sim800_object);
     error_type_t sim800_reset(sim800_t* sim800_object);
-    error_type_t Validate_rst(sim800_t* sim800_object);
 
 #ifdef __cplusplus
 }

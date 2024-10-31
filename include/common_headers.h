@@ -15,6 +15,7 @@ extern "C"
         INVALID_MODE,
         INVALID_BAUD_RATE,
         INVALID_LENGTH,
+        INVALID_TEMPERATURE,
         TIMED_OUT,
         BUFFER_OVERFLOW,
         UNKNOWN,
