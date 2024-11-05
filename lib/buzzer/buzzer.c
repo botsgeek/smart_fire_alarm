@@ -94,3 +94,10 @@ error_type_t buzzer_tone(buzzer_t* buzzer_object, uint32_t tone_duration, uint32
 
     return OK;
 }
+
+error_type_t buzzer_destroy(buzzer_t** buzzer_object) {
+    if(buzzer_object == NULL)return NULL_PARAMETER;
+    free(*buzzer_object);
+  
+    return OK;
+}
