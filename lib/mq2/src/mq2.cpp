@@ -35,6 +35,7 @@ mq2_t* mq2_create(const mq2_config_t* config){
     new_mq_2_obj->mode = config->mode;
     new_mq_2_obj->initialized = false;
     new_mq_2_obj->has_isr = false;
+    Serial.println("mq2 create completed");
     return new_mq_2_obj;
 }
 
@@ -67,7 +68,9 @@ error_type_t mq2_init(mq2_t* mq2_object){
         if (analog_err != OK) return analog_err;
         error_type_t digital_err = mq2_init_digital_mode(mq2_object);
         if (digital_err != OK) return digital_err;
+        digitalRead(mq2_object->analog_pin_number);
         mq2_object->initialized = true;
+        Serial.println("mq2 init is sucessful");
         return OK;
     }
     else return INVALID_PARAMETER;
@@ -91,16 +94,26 @@ error_type_t mq2_init_with_isr(mq2_t* mq2_object, void(*callback)()){
     return OK;
 }
 
+error_type_t mq2_destroy(mq2_t** mq2_object){
+    // Since arduino does not de-initialized pins
+    // Nothing to do here than to free our object to
+    // Release the memory
+    if(mq2_object == NULL)return NULL_PARAMETER;
+    free(*mq2_object);
+    return OK;
+}
+
 error_type_t mq2_deinit(mq2_t* mq2_object){
     // Since arduino does not de-initialized pins
     // Nothing to do here than to free our object to
     // Release the memory
+    if(mq2_object == NULL)return NULL_PARAMETER;
+    if(!mq2_object->initialized) return INVALID_STATE;
     if(mq2_object){
         mq2_object->initialized = false;
         if(mq2_object->has_isr){
             detachInterrupt(mq2_object->digital_pin_number);
         }
-        free(mq2_object);
     }
     return OK;
 }
@@ -112,6 +125,8 @@ error_type_t mq2_analog_read(mq2_t *mq2_object, uint16_t *value_ptr){
         return INVALID_MODE;
     }
     *value_ptr = analogRead(mq2_object->analog_pin_number);
+    Serial.println(*value_ptr);
+    Serial.println("analog reading is sucessful");
     return OK;
 }
 error_type_t mq2_digital_read(mq2_t *mq2_object, uint16_t *value_ptr){
@@ -121,6 +136,7 @@ error_type_t mq2_digital_read(mq2_t *mq2_object, uint16_t *value_ptr){
         return INVALID_MODE;
     }
     *value_ptr = digitalRead(mq2_object->digital_pin_number);
+      Serial.println(*value_ptr);
     return OK;
 }
 
