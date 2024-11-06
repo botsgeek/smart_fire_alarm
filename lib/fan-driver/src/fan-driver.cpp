@@ -3,7 +3,8 @@
 #include "common_headers.h"
 #include <stdbool.h>
 
-#define FAN_PIN_NUMBER 5
+#define MAX_FAN_PIN_NUMBER 5
+#define MIN_FAN_PIN_NUMBER 3
 
 
 struct fan_t
@@ -29,7 +30,7 @@ error_type_t fan_init(fan_t* fan_object){
     if(fan_object == NULL){
          return NULL_PARAMETER;
     }
-    if (fan_object->fan_pin_number != FAN_PIN_NUMBER)
+    if (fan_object->fan_pin_number > MAX_FAN_PIN_NUMBER || fan_object->fan_pin_number < MIN_FAN_PIN_NUMBER)
     {
        
         return INVALID_PIN_NUMBER;
