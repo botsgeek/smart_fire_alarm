@@ -89,6 +89,11 @@ void test_fan_deinit(void){
   deinit(my_fan); 
 
 }
+
+void test_Destroy(void){
+  fan_t* my_fan = NULL;
+  destroy(&my_fan);
+}
 int runUnityTests(void){
     UNITY_BEGIN();
     RUN_TEST(test_create);
