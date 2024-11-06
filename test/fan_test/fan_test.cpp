@@ -4,7 +4,7 @@
 #define TAG "TEST"
 
 fan_t* my_fan;
-fan_t* fake_my_fan;
+fan_t* fake_fan;
 
 void setUp(void)
 {
@@ -20,8 +20,8 @@ void test_create(void){
     fan_config_t config ={.fan_pin_number = 5};
     my_fan = fan_create(&config);
     TEST_ASSERT_NOT_EQUAL(NULL, my_fan);
-    fake_my_fan = fan_create(NULL);
-    TEST_ASSERT_EQUAL(NULL, my_fan);
+    fake_fan = fan_create(NULL);
+    TEST_ASSERT_EQUAL(NULL, fake_fan);
 
 }
 void test_wrong_fan_init(void){
@@ -29,38 +29,64 @@ void test_wrong_fan_init(void){
     my_fan = fan_create(&config);
     TEST_ASSERT_NOT_EQUAL(NULL,my_fan);
     error_type_t err = fan_init(my_fan);
-    TEST_ASSERT_EQUAL(INVALID_PIN_NUMBER,err);
+    TEST_ASSERT_EQUAL(OK,err);
     free(my_fan);
 
     fan_config_t config1 ={.fan_pin_number = 11};
     my_fan = fan_create(&config1);
     TEST_ASSERT_NOT_EQUAL(NULL, my_fan);
     err = fan_init(my_fan);
-    TEST_ASSERT_EQUAL(INVALID_PIN_NUMBER,err);
+    TEST_ASSERT_EQUAL(INVALID_PIN_NUMBER, err);
     free(my_fan);
-
     err = fan_init(NULL);
-    TEST_ASSERT_EQUAL(NULL_PARAMETER, err);
+    TEST_ASSERT_EQUAL(NULL_PARAMETER,err);
+    
+    
 
 }
 
 void test_right_fan_init(void){
-    fan_config_t config = {.fan_pin_number = 5};
+    fan_config_t config = {.fan_pin_number = 4};
     my_fan = fan_create(&config);
     TEST_ASSERT_NOT_EQUAL(NULL,my_fan);
     error_type_t err = fan_init(my_fan);
-    TEST_ASSERT_EQUAL(INVALID_PIN_NUMBER, err);
+    TEST_ASSERT_EQUAL(OK, err);
     free(my_fan);
 
-    fan_config_t config2 = {.fan_pin_number = 40};
+    fan_config_t config2 = {.fan_pin_number = 13};
     my_fan = fan_create(&config2);
     TEST_ASSERT_NOT_EQUAL(NULL, my_fan);
     err = fan_init(my_fan);
     TEST_ASSERT_EQUAL(INVALID_PIN_NUMBER, err);
     free(my_fan);
-
     err = fan_init(NULL);
     TEST_ASSERT_EQUAL(NULL_PARAMETER, err);
+
+}
+void test_set_fanspeed(void){
+  uint8_t fanspeed;
+  fan_config_t config = {.fan_pin_number = 3};
+  my_fan = fan_create(&config);
+  TEST_ASSERT_NOT_EQUAL(NULL, my_fan);
+  error_type_t err = set_fanspeed(my_fan, fanspeed);
+  TEST_ASSERT_EQUAL(INVALID_STATE,err);
+  err = fan_init(my_fan);
+  TEST_ASSERT_EQUAL(OK,err);
+  free(my_fan);
+
+  fan_config_t config2{.fan_pin_number = 11};
+  my_fan = fan_create(&config2);
+  TEST_ASSERT_NOT_EQUAL(NULL,my_fan);
+  err = fan_init(my_fan);
+  TEST_ASSERT_EQUAL(INVALID_PIN_NUMBER, err);
+  err = set_fanspeed(NULL, fanspeed);
+  TEST_ASSERT_EQUAL(NULL_PARAMETER,err);
+  free(my_fan);
+  
+}
+
+void test_fan_deinit(void){
+  deinit(my_fan); 
 
 }
 int runUnityTests(void){
@@ -68,6 +94,8 @@ int runUnityTests(void){
     RUN_TEST(test_create);
     RUN_TEST(test_wrong_fan_init);
     RUN_TEST(test_right_fan_init);
+    RUN_TEST(test_set_fanspeed);
+    RUN_TEST(test_fan_deinit);
     return UNITY_END();
 }
 void setup()
