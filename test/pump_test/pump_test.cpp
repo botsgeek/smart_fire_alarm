@@ -103,12 +103,24 @@ void test_off(void){
 }
 
 void test_deinit(void){
-  pump_deinit(my_pump);
+  pump_config_t config4 = {.pump_pin_number = A3};
+  my_pump = pump_create(&config4);
+  TEST_ASSERT_NOT_EQUAL(NULL, my_pump);
+  error_type_t err = pump_init(my_pump);
+  TEST_ASSERT_EQUAL(INVALID_PIN_NUMBER, err);
+  err = pump_deinit(NULL);
+  TEST_ASSERT_EQUAL(NULL_PARAMETER,err);
 }
 
 void test_destroy(void){
-  pump_t* my_pump = NULL;
-  pump_destroy(&my_pump);
+  pump_config_t config4 = {.pump_pin_number = A3};
+  my_pump = pump_create(&config4);
+  TEST_ASSERT_NOT_EQUAL(NULL, my_pump);
+  error_type_t err = pump_init(my_pump);
+  TEST_ASSERT_EQUAL(INVALID_PIN_NUMBER, err);
+  err = pump_destroy(NULL);
+  TEST_ASSERT_EQUAL(NULL_PARAMETER, err);
+
 }
 
 int runUnityTest(){

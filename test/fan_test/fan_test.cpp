@@ -86,13 +86,17 @@ void test_set_fanspeed(void){
 }
 
 void test_fan_deinit(void){
-  deinit(my_fan); 
+
+  error_type_t err = deinit(NULL);
+  TEST_ASSERT_EQUAL(NULL_PARAMETER,err);
+   
 
 }
 
 void test_Destroy(void){
-  fan_t* my_fan = NULL;
-  destroy(&my_fan);
+
+  error_type_t err = destroy(NULL);
+  TEST_ASSERT_EQUAL(NULL_PARAMETER, err);
 }
 int runUnityTests(void){
     UNITY_BEGIN();
@@ -101,6 +105,7 @@ int runUnityTests(void){
     RUN_TEST(test_right_fan_init);
     RUN_TEST(test_set_fanspeed);
     RUN_TEST(test_fan_deinit);
+    RUN_TEST(test_Destroy);
     return UNITY_END();
 }
 void setup()
