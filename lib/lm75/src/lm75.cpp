@@ -46,13 +46,14 @@ lm75_t* lm75_create(const lm75_config_t* config){
 }
 
 error_type_t lm75_deinit(lm75_t* lm75_object){
-    if(lm75_object){
-        lm75_object->initialized = false;
+    if(lm75_object == NULL){
+        return NULL_PARAMETER;
         if(lm75_object->has_isr){
             detachInterrupt(lm75_object->os_pin_number);
         }
-        free(lm75_object);
+        
     }
+    lm75_object->initialized = false;
     return OK;
 }
 error_type_t lm75_destroy(lm75_t** lm75_object){

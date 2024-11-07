@@ -32,10 +32,9 @@ error_type_t buzzer_init(buzzer_t* buzzer_object)
 }
 
 error_type_t buzzer_deinit(buzzer_t* buzzer_object) {
-    if(buzzer_object){
+    if(buzzer_object == NULL)return NULL_PARAMETER;
         buzzer_object->activated = false;
-        free(buzzer_object);
-    }
+        
     return OK;
 }
 
