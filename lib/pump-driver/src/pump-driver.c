@@ -73,8 +73,8 @@ error_type_t pump_off(pump_t* pump_object){
 
 error_type_t pump_deinit(pump_t* pump_object){
     if (pump_object == NULL)return NULL_PARAMETER;
-        pump_object->initalized = false;
-
+    if (pump_object->initalized == false)return INVALID_STATE;
+    pump_object->initalized = false;
         return OK;
         
      
@@ -82,6 +82,7 @@ error_type_t pump_deinit(pump_t* pump_object){
 }
 error_type_t pump_destroy(pump_t** pump_object){
     if(pump_object == NULL)return NULL_PARAMETER;
+    *pump_object = NULL;
     free(*pump_object);
     return OK;
 }
