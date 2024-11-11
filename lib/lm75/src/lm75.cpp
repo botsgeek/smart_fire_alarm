@@ -30,7 +30,7 @@ lm75_t* lm75_create(const lm75_config_t* config){
 
  error_type_t lm75_init_comparator_mode(lm75_t* lm75_object){
     if(lm75_object == NULL)return INVALID_PARAMETER;
-   
+    if (lm75_object->initialized == true)return INVALID_STATE;
     lm75_object->initialized = true;
     Wire.begin();
     return OK;
@@ -53,11 +53,14 @@ error_type_t lm75_deinit(lm75_t* lm75_object){
         }
         
     }
+    if (lm75_object->initialized == false)return INVALID_STATE;
+    
     lm75_object->initialized = false;
     return OK;
 }
 error_type_t lm75_destroy(lm75_t** lm75_object){
     if(lm75_object == NULL)return NULL_PARAMETER;
+    *lm75_object = NULL;
         free(*lm75_object);
     
     return OK;

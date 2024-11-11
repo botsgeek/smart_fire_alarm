@@ -68,7 +68,7 @@ void test_off(void){
 }
 
 void test_deinit(void){
-  pump_config_t config3 = {.pump_pin_number = 4};
+  pump_config_t config3 = {.pump_pin_number = 7};
   my_pump = pump_create(&config3);
 
    
@@ -77,20 +77,7 @@ void test_deinit(void){
   err = pump_off(my_pump);
   TEST_ASSERT_EQUAL(INVALID_STATE, err);
   err = pump_deinit(NULL);
-  TEST_ASSERT_EQUAL(NULL,err);
-
-
-  
-}
-
-void test_destroy(void){
-  pump_config_t config4 = {.pump_pin_number = A3};
-  my_pump = pump_create(&config4);
-
-  error_type_t err = pump_init(my_pump);
-  TEST_ASSERT_EQUAL(INVALID_PIN_NUMBER, err);
-  err = pump_destroy(NULL);
-  TEST_ASSERT_EQUAL(NULL_PARAMETER, err);
+  TEST_ASSERT_EQUAL(NULL_PARAMETER,err);
 
   err = pump_deinit(my_pump);
   TEST_ASSERT_EQUAL(INVALID_STATE,err);
@@ -99,7 +86,24 @@ void test_destroy(void){
   err = pump_deinit(my_pump);
   TEST_ASSERT_EQUAL(OK, err);
 
-  
+  err = pump_on(my_pump);
+  TEST_ASSERT_EQUAL(INVALID_STATE, err);
+  err = pump_off(my_pump);
+  TEST_ASSERT_EQUAL(INVALID_STATE, err);
+  free(my_pump);
+ 
+}
+
+void test_destroy(void){
+  error_type_t err = pump_destroy(NULL);
+  TEST_ASSERT_EQUAL(NULL_PARAMETER,err);
+
+  pump_config_t config3 = {.pump_pin_number = 7};
+  my_pump = pump_create(&config3);
+
+  err = pump_destroy(&my_pump);
+  TEST_ASSERT_EQUAL(OK,err);
+  TEST_ASSERT_EQUAL(NULL,my_pump); 
 
 }
 
