@@ -73,6 +73,7 @@ void test_lm75_read(void){
     TEST_ASSERT_EQUAL(INVALID_STATE, err);
     err1 = lm75_read(NULL);
     TEST_ASSERT_EQUAL(INVALID_TEMPERATURE, err1);
+    free(my_lm75);
 
 }
 
