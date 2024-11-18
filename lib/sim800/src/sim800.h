@@ -68,6 +68,7 @@ extern "C"
      * @return error_type_t
      */
     error_type_t sim800_connect(sim800_t *sim800_object);
+    error_type_t sim800_destroy(sim800_t** sim800_object);
 
 #ifdef __cplusplus
 }

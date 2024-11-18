@@ -244,6 +244,7 @@ error_type_t sim800_deinit(sim800_t *sim800_object)
 }
 error_type_t sim800_destroy(sim800_t** sim800_object){
     if(sim800_object == NULL)return NULL_PARAMETER;
+    *sim800_object = NULL;
         free(*sim800_object);
     
     return OK;
