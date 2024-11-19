@@ -92,8 +92,9 @@ extern "C"
  error_type_t lm75_destroy(lm75_t** lm75_object);
 
 
-}
+
 #ifdef __cplusplus
+}
 #endif
 
 #endif
