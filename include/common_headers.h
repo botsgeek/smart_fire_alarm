@@ -15,9 +15,12 @@ extern "C"
         INVALID_MODE,
         INVALID_BAUD_RATE,
         INVALID_LENGTH,
+        INVALID_TEMPERATURE,
+        FREE_OBJECT,
         TIMED_OUT,
         BUFFER_OVERFLOW,
         UNKNOWN,
+        SUCCESS,
         FAILED
 
     } error_type_t;
