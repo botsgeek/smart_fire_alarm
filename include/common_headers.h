@@ -16,6 +16,7 @@ extern "C"
         INVALID_BAUD_RATE,
         INVALID_LENGTH,
         INVALID_TEMPERATURE,
+        ACTIVATE_DRIVER,
         TIMED_OUT,
         BUFFER_OVERFLOW,
         UNKNOWN,
