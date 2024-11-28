@@ -1,5 +1,8 @@
 #include <Arduino.h>
 #include <state.h>
+#include <buzzer.h>
+#include <fan-driver.h>
+#include <pump-driver.h>
 #include <lm75-manager.h>
 #include <mq2-manager.h>
 
@@ -7,6 +10,9 @@ struct state_t
 {
     lm75_t* lm75_state;
     mq2_t* mq2_state;
+    buzzer_t* buzzer_object;
+    fan_t* fan_object;
+    pump_t* pump_object;
     state_trans_t current_state;
     bool initialize;
 };
@@ -49,6 +55,10 @@ error_type_t state_destroy(state_t** state_obj){
 error_type_t transition(state_t* state_obj, bool heat, bool smoke){
     if(state_obj == NULL)return NULL_PARAMETER;
     if(!state_obj->initialize)return INVALID_STATE;
+      bool state;
+      uint8_t pwm_cycle;
+      uint8_t fan_speed;
+
     
      switch (state_obj->current_state)
     {
@@ -57,6 +67,8 @@ error_type_t transition(state_t* state_obj, bool heat, bool smoke){
         {
             heat = false;
             smoke = false;
+            buzzer_stop(state_obj->buzzer_object);
+            pump_off(state_obj->pump_object);
             state_obj->current_state = NORMAL_STATE;
             
         }
@@ -64,6 +76,11 @@ error_type_t transition(state_t* state_obj, bool heat, bool smoke){
         {
             heat = true;
             smoke = true;
+            lm75_above_threshold(state_obj->lm75_state, &state);
+            mq2_above_threshold(state_obj->mq2_state, &state);
+            buzzer_start(state_obj->buzzer_object, &pwm_cycle);
+            pump_on(state_obj->pump_object);
+            set_fanspeed(state_obj->fan_object, &fan_speed);
             state_obj->current_state = ACTIVATE_DRIVERS;
         }
         
@@ -73,11 +90,17 @@ error_type_t transition(state_t* state_obj, bool heat, bool smoke){
         {
             heat = false;
             smoke = true;
+            lm75_above_threshold(state_obj->lm75_state, &state);
+            mq2_above_threshold(state_obj->mq2_state, &state);
+            buzzer_start(state_obj->buzzer_object, &pwm_cycle);
+            set_fanspeed(state_obj->fan_object, &fan_speed);
             state_obj->current_state = ACTIVATE_DRIVERS;
         }
         else if(!heat && !smoke){
             heat = false;
             smoke = false;
+            buzzer_stop(state_obj->buzzer_object);
+            pump_off(state_obj->pump_object);
             state_obj->current_state = NORMAL_STATE;
 
         }
@@ -87,11 +110,16 @@ error_type_t transition(state_t* state_obj, bool heat, bool smoke){
         {
             heat = true;
             smoke = false;
+            buzzer_start(state_obj->buzzer_object, &pwm_cycle);
+            pump_on(state_obj->pump_object);
+            set_fanspeed(state_obj->fan_object, &fan_speed);
             state_obj->current_state = ACTIVATE_DRIVERS; 
         }
         else if (!heat && !smoke){
             heat = false;
             smoke = false;
+            buzzer_stop(state_obj->buzzer_object);
+            pump_off(state_obj->pump_object);
             state_obj->current_state = NORMAL_STATE;
         }
         break;

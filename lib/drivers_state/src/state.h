@@ -1,10 +1,13 @@
-#ifndef _LM75_MANAGER_H_
-#define _LM75_MANAAGER_H_
+#ifndef _STATE_H_
+#define _STATE_H_
 #include <stdint.h>
 #ifdef __cplusplus
 extern "C" {
 #endif
 #include <common_headers.h>
+#include <buzzer.h>
+#include <fan-driver.h>
+#include <pump-driver.h>
 #include <lm75-manager.h>
 #include <mq2-manager.h>
 
@@ -23,6 +26,9 @@ typedef enum{
 typedef struct{
     lm75_t* lm75_state;
     mq2_t* mq2_state;
+    buzzer_t* buzzer_object;
+    fan_t* fan_object;
+    pump_t* pump_object;
     state_trans_t current_state;
     
 }state_config_t;
