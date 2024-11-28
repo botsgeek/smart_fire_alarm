@@ -6,35 +6,37 @@
 #include <lm75-manager.h>
 #include <mq2-manager.h>
 
-struct state_t
+struct state_machine_t
 {
-    lm75_t* lm75_state;
-    mq2_t* mq2_state;
-    buzzer_t* buzzer_object;
-    fan_t* fan_object;
-    pump_t* pump_object;
-    state_trans_t current_state;
+    // lm75_manager_t* lm75_manager;
+    // mq2_manager_t* mq2_manager;
+    // buzzer_t* buzzer_object;
+    // fan_t* fan_object;
+    // pump_t* pump_object;
+    state_t current_state;
+    state_machine_handler_t handler;
     bool initialize;
 };
 
-state_t* state_create(const state_config_t* config){
-    if (config == NULL)return NULL;
+state_machine_t* state_machine_create(const state_config_t* state_config){
+    if (state_config == NULL)return NULL;
 
-    state_t* state_obj = (state_t*)malloc(sizeof(state_t));
-    state_obj->lm75_state = config->lm75_state;
-    state_obj->mq2_state = config->mq2_state;
-    state_obj->current_state = config->current_state;
+    state_machine_t* state_obj = (state_machine_t*)malloc(sizeof(state_t));
+    // state_obj->lm75_state = state_config->lm75_state;
+    // state_obj->mq2_state = state_config->mq2_state;
+    state_obj->current_state = state_config->current_state;
+    state_obj->handler = state_config->handler;
     state_obj->initialize = false;
     return state_obj;   
 }
 
-error_type_t state_init(state_t* state_obj){
+error_type_t state_machine_init(state_machine_t* state_obj){
     if(state_obj == NULL)return NULL_PARAMETER;
     state_obj->initialize = true;
     return OK;
 }
 
-error_type_t state_deinit(state_t* state_obj){
+error_type_t state_machine_deinit(state_machine_t* state_obj){
     if (state_obj == NULL)
     {
         return NULL_PARAMETER;
@@ -45,89 +47,47 @@ error_type_t state_deinit(state_t* state_obj){
     
 }
 
-error_type_t state_destroy(state_t** state_obj){
+error_type_t state_machine_destroy(state_machine_t** state_obj){
     if(state_obj == NULL)return NULL_PARAMETER;
     *state_obj = NULL;
     free(*state_obj);
     return OK;
 }
 
-error_type_t transition(state_t* state_obj, bool heat, bool smoke){
+static void handle_transition(state_machine_t* state_obj, const bool heat, const bool smoke){
+    if(!heat && !smoke)return;
+    if(heat && !smoke){
+        state_obj->current_state = STATE_MACHINE_HEAT_NO_SMOKE;
+        return;
+    }
+    if (!heat && smoke)
+    {
+        state_obj->current_state = STATE_MACHINE_SMOKE_NO_HEAT;
+        return;
+    }
+    if (heat && smoke)
+    {
+        state_obj->current_state = STATE_MACHINE_HEAT_AND_SMOKE;
+        return;
+    }
+     
+}
+
+error_type_t state_machine_transition(state_machine_t* state_obj, const bool heat, const bool smoke){
+    //change the bool value to const
     if(state_obj == NULL)return NULL_PARAMETER;
     if(!state_obj->initialize)return INVALID_STATE;
-      bool state;
-      uint8_t pwm_cycle;
-      uint8_t fan_speed;
 
-    
-     switch (state_obj->current_state)
-    {
-    case IDLE_STATE:
-        if (!heat|| !smoke)
-        {
-            heat = false;
-            smoke = false;
-            buzzer_stop(state_obj->buzzer_object);
-            pump_off(state_obj->pump_object);
-            state_obj->current_state = NORMAL_STATE;
-            
-        }
-        else if (heat && smoke)
-        {
-            heat = true;
-            smoke = true;
-            lm75_above_threshold(state_obj->lm75_state, &state);
-            mq2_above_threshold(state_obj->mq2_state, &state);
-            buzzer_start(state_obj->buzzer_object, pwm_cycle);
-            pump_on(state_obj->pump_object);
-            set_fanspeed(state_obj->fan_object, fan_speed);
-            state_obj->current_state = ACTIVATE_DRIVERS;
-        }
-        
-        break;
-    case DETECT_SMOKE:
-        if (!heat && smoke)
-        {
-            heat = false;
-            smoke = true;
-            lm75_above_threshold(state_obj->lm75_state, &state);
-            mq2_above_threshold(state_obj->mq2_state, &state);
-            buzzer_start(state_obj->buzzer_object, pwm_cycle);
-            set_fanspeed(state_obj->fan_object, fan_speed);
-            state_obj->current_state = ACTIVATE_DRIVERS;
-        }
-        else if(!heat && !smoke){
-            heat = false;
-            smoke = false;
-            buzzer_stop(state_obj->buzzer_object);
-            pump_off(state_obj->pump_object);
-            state_obj->current_state = NORMAL_STATE;
-
-        }
-        break;
-    case DETECT_HEATS:
-        if (heat && !smoke)
-        {
-            heat = true;
-            smoke = false;
-            buzzer_start(state_obj->buzzer_object, pwm_cycle);
-            pump_on(state_obj->pump_object);
-            set_fanspeed(state_obj->fan_object, fan_speed);
-            state_obj->current_state = ACTIVATE_DRIVERS; 
-        }
-        else if (!heat && !smoke){
-            heat = false;
-            smoke = false;
-            buzzer_stop(state_obj->buzzer_object);
-            pump_off(state_obj->pump_object);
-            state_obj->current_state = NORMAL_STATE;
-        }
-        break;
-    
-    default:
-        break;
-    }
+      state_t temp = state_obj->current_state;
+    handle_transition(state_obj,heat,smoke);
+    //   if (temp != state_obj->current_state)
+    //   {
+        state_obj->handler(state_obj->current_state);
+      //}
+      
     return OK;
      
 }
+
+
 
