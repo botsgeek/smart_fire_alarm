@@ -78,9 +78,9 @@ error_type_t transition(state_t* state_obj, bool heat, bool smoke){
             smoke = true;
             lm75_above_threshold(state_obj->lm75_state, &state);
             mq2_above_threshold(state_obj->mq2_state, &state);
-            buzzer_start(state_obj->buzzer_object, &pwm_cycle);
+            buzzer_start(state_obj->buzzer_object, pwm_cycle);
             pump_on(state_obj->pump_object);
-            set_fanspeed(state_obj->fan_object, &fan_speed);
+            set_fanspeed(state_obj->fan_object, fan_speed);
             state_obj->current_state = ACTIVATE_DRIVERS;
         }
         
@@ -92,8 +92,8 @@ error_type_t transition(state_t* state_obj, bool heat, bool smoke){
             smoke = true;
             lm75_above_threshold(state_obj->lm75_state, &state);
             mq2_above_threshold(state_obj->mq2_state, &state);
-            buzzer_start(state_obj->buzzer_object, &pwm_cycle);
-            set_fanspeed(state_obj->fan_object, &fan_speed);
+            buzzer_start(state_obj->buzzer_object, pwm_cycle);
+            set_fanspeed(state_obj->fan_object, fan_speed);
             state_obj->current_state = ACTIVATE_DRIVERS;
         }
         else if(!heat && !smoke){
@@ -110,9 +110,9 @@ error_type_t transition(state_t* state_obj, bool heat, bool smoke){
         {
             heat = true;
             smoke = false;
-            buzzer_start(state_obj->buzzer_object, &pwm_cycle);
+            buzzer_start(state_obj->buzzer_object, pwm_cycle);
             pump_on(state_obj->pump_object);
-            set_fanspeed(state_obj->fan_object, &fan_speed);
+            set_fanspeed(state_obj->fan_object, fan_speed);
             state_obj->current_state = ACTIVATE_DRIVERS; 
         }
         else if (!heat && !smoke){
