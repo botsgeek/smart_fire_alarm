@@ -7,7 +7,7 @@ extern "C" {
 #include <common_headers.h>
 #include <mq2.h>
 
-typedef struct mq2_t mq2_t;
+typedef struct mq2_manager_t mq2_manager_t;
 
 //mq2 manager
 typedef struct{
@@ -16,13 +16,13 @@ typedef struct{
     mq2_t* mq2_object;
     
 
-}mq2_lib_t;
+}mq2_manager_config_t;
 
-mq2_t* create_mq2(const mq2_lib_t* config_lib);
-error_type_t init_mq2(mq2_t* mq2_state);
-error_type_t deinit_mq2(mq2_t* mq2_state);
-error_type_t destory_mq2(mq2_t** mq2_state);
-error_type_t mq2_above_threshold(mq2_t* mq2_state, bool* state);
+mq2_manager_t* mq2_manager_create(const mq2_manager_config_t* manager_config);
+error_type_t mq2_manager_init(mq2_manager_t* mq2_manager);
+error_type_t mq2_manager_deinit(mq2_manager_t* mq2_manager);
+error_type_t mq2_manager_destory(mq2_manager_t** mq2_manager);
+error_type_t mq2_manager_above_threshold(mq2_manager_t* mq2_manager, bool* state);
 
 
 

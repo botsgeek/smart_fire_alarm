@@ -7,7 +7,7 @@ extern "C" {
 #include <common_headers.h>
 #include <lm75.h>
 
-typedef struct lm75_t lm75_t;
+typedef struct lm75_manager_t lm75_manager_t;
 
 //lm75 manager
 typedef struct{
@@ -15,14 +15,14 @@ typedef struct{
     float lm75_threshold;
     lm75_t* lm75_obj;
 
-}my_lm75_config_t;
+}lm75_manager_config_t;
 
 
-lm75_t* create_lm75(const my_lm75_config_t* config_state);
-error_type_t lm75_above_threshold(lm75_t* lm75_state, bool* state);
-error_type_t deinit_lm75(lm75_t* lm75_state);
-error_type_t destroy_lm75(lm75_t** lm75_state);
-error_type_t init_lm75(lm75_t* lm75_state);
+lm75_manager_t* lm75_manager_create(const lm75_manager_config_t* manager_config);
+error_type_t lm75_manager_above_threshold(lm75_manager_t* lm75_manager, bool* state);
+error_type_t lm75_manager_deinit(lm75_manager_t* lm75_manager);
+error_type_t lm75_manager_destroy(lm75_manager_t** lm75_manager);
+error_type_t lm75_manager_init(lm75_manager_t* lm75_manager);
 
 
 #ifdef __cplusplus
