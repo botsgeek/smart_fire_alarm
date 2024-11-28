@@ -13,7 +13,7 @@ extern "C"
     typedef struct 
     {
         uint8_t buzzer_pin;
-        bool activated;
+        //bool activated;
     }buzzer_config_t;
     
 
