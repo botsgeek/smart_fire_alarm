@@ -53,6 +53,22 @@ error_type_t set_fanspeed(fan_t* fan_object,  uint8_t fanspeed){
     return OK;
     
 }
+
+error_type_t off_fan(fan_t* fan_object){
+    if(fan_object == NULL)
+    return NULL_PARAMETER;
+    if (fan_object->activated != true)
+    {
+      
+        return INVALID_STATE;
+    }
+      
+    analogWrite(fan_object->fan_pin_number, 0);
+    
+    return OK;
+    
+}
+
 error_type_t deinit(fan_t* fan_object){
     if(fan_object){
         fan_object->activated = false;
