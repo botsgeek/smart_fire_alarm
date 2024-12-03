@@ -1,5 +1,5 @@
 #include <Arduino.h>
-#include <state.h>
+#include <state-machine.h>
 #include <buzzer.h>
 #include <fan-driver.h>
 #include <pump-driver.h>
@@ -78,7 +78,7 @@ error_type_t state_machine_transition(state_machine_t* state_obj, const bool hea
     if(state_obj == NULL)return NULL_PARAMETER;
     if(!state_obj->initialize)return INVALID_STATE;
 
-      state_t temp = state_obj->current_state;
+    //   state_t temp = state_obj->current_state;
     handle_transition(state_obj,heat,smoke);
     //   if (temp != state_obj->current_state)
     //   {

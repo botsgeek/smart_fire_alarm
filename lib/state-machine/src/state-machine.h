@@ -1,5 +1,5 @@
-#ifndef _STATE_H_
-#define _STATE_H_
+#ifndef _STATE_MACHINE_H_
+#define _STATE_MACHINE_H_
 #include <stdint.h>
 #ifdef __cplusplus
 extern "C" {
