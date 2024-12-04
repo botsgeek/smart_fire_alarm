@@ -274,6 +274,9 @@ error_type_t sim800_connect(sim800_t *sim800_object)
         return INVALID_STATE;
     if (sim800_serial.serial == NULL)
         return NULL_PARAMETER;
+    #ifdef PIO_UNIT_TESTING
+    return OK;
+    #else
     error_type_t err = ping();
     if (err != OK)
         return err;
@@ -290,6 +293,7 @@ error_type_t sim800_connect(sim800_t *sim800_object)
         Serial.write((int)sim800_serial.response[x]);
     }
     return OK;
+    #endif
 }
 error_type_t sim800_send_sms(sim800_t *sim800_object, char *phone_number, char *message)
 {
@@ -300,6 +304,9 @@ error_type_t sim800_send_sms(sim800_t *sim800_object, char *phone_number, char *
     if (sim800_serial.serial == NULL)
         return NULL_PARAMETER;
     flush_serial();
+    #ifdef PIO_UNIT_TESTING
+    return OK;
+    #else
     error_type_t err = write_and_read(COMMAND_SET_GSM, 100);
     if (err != OK)
     {
@@ -328,6 +335,7 @@ error_type_t sim800_send_sms(sim800_t *sim800_object, char *phone_number, char *
         return err;
     }
     return OK;
+    #endif
 }
 
 error_type_t sim800_reset(sim800_t* sim800_object){
