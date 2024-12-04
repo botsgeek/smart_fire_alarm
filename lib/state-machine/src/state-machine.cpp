@@ -8,11 +8,6 @@
 
 struct state_machine_t
 {
-    // lm75_manager_t* lm75_manager;
-    // mq2_manager_t* mq2_manager;
-    // buzzer_t* buzzer_object;
-    // fan_t* fan_object;
-    // pump_t* pump_object;
     state_t current_state;
     state_machine_handler_t handler;
     bool initialize;
@@ -22,8 +17,6 @@ state_machine_t* state_machine_create(const state_config_t* state_config){
     if (state_config == NULL)return NULL;
 
     state_machine_t* state_obj = (state_machine_t*)malloc(sizeof(state_t));
-    // state_obj->lm75_state = state_config->lm75_state;
-    // state_obj->mq2_state = state_config->mq2_state;
     state_obj->current_state = state_config->current_state;
     state_obj->handler = state_config->handler;
     state_obj->initialize = false;
@@ -88,6 +81,3 @@ error_type_t state_machine_transition(state_machine_t* state_obj, const bool hea
     return OK;
      
 }
-
-
-

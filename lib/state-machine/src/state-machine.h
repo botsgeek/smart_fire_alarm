@@ -25,11 +25,6 @@ typedef void(*state_machine_handler_t)(state_t);
 
 
 typedef struct{
-    // lm75_t* lm75_state;
-    // mq2_t* mq2_state;
-    // buzzer_t* buzzer_object;
-    // fan_t* fan_object;
-    // pump_t* pump_object;
     state_t current_state;
     state_machine_handler_t handler;
     
