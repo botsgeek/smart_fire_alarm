@@ -167,14 +167,14 @@ void setup()
   }
 
     //sim800 create and init
-  // sim800 = sim800_create(&sim800_config);
-  // if(!sim800){
-  //   exit(1);
-  // }
-  // err = sim800_init(sim800);
-  // if(err != OK){
-  //   exit(1);
-  // }
+  sim800 = sim800_create(&sim800_config);
+  if(!sim800){
+    exit(1);
+  }
+  err = sim800_init(sim800);
+  if(err != OK){
+    exit(1);
+  }
 
 
   mq2_manager_config_t mq2_manager_config = {
