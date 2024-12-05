@@ -20,7 +20,7 @@ void tearDown(void)
   // clean stuff up here
 }
 
-void test_config(void){
+void test_buzzer_config(void){
     buzzer_config_t config ={.buzzer_pin = 13};
     my_buzzer = buzzer_create(&config);
     TEST_ASSERT_NOT_EQUAL(NULL,my_buzzer);
@@ -30,7 +30,7 @@ void test_config(void){
 
 }
 
-void test_init(void){
+void test_buzzer_init(void){
   error_type_t err = buzzer_init(NULL);
   TEST_ASSERT_EQUAL(NULL_PARAMETER,err);
 
@@ -46,7 +46,7 @@ void test_init(void){
     free(my_buzzer);
 }
 
-void test_start(void){
+void test_buzzer_start(void){
  
   error_type_t err = buzzer_start(NULL,pwn_cycle);
   TEST_ASSERT_EQUAL(NULL_PARAMETER, err);
@@ -67,7 +67,7 @@ void test_start(void){
     free(my_buzzer);
 }
 
-void test_stop(void){
+void test_buzzer_stop(void){
   error_type_t err = buzzer_stop(NULL);
   TEST_ASSERT_EQUAL(NULL_PARAMETER,err);
 
@@ -87,7 +87,7 @@ void test_stop(void){
     free(my_buzzer);
 }
 
-void test_tone(void){
+void test_buzzer_tone(void){
  
   error_type_t err = buzzer_tone(NULL, duration, total_time);
   TEST_ASSERT_EQUAL(NULL_PARAMETER, err);
@@ -108,7 +108,7 @@ void test_tone(void){
     free(my_buzzer);
 }
 
-void test_deinit(void){
+void test_buzzer_deinit(void){
    buzzer_config_t config2 ={.buzzer_pin = 13};
     my_buzzer = buzzer_create(&config2);
   error_type_t err = buzzer_start(my_buzzer,pwn_cycle);
@@ -128,7 +128,7 @@ void test_deinit(void){
 
 }
 
-void test_Destroy(void){
+void test_buzzer_Destroy(void){
   error_type_t err = buzzer_destroy(NULL);
   TEST_ASSERT_EQUAL(NULL_PARAMETER, err);
 
@@ -143,13 +143,13 @@ void test_Destroy(void){
 
 int runUnityTests(void){
   UNITY_BEGIN();
-  RUN_TEST(test_config);
-  RUN_TEST(test_init);
-  RUN_TEST(test_start);
-  RUN_TEST(test_stop);
-  RUN_TEST(test_tone);
-  RUN_TEST(test_deinit);
-  RUN_TEST(test_Destroy);
+  RUN_TEST(test_buzzer_config);
+  RUN_TEST(test_buzzer_init);
+  RUN_TEST(test_buzzer_start);
+  RUN_TEST(test_buzzer_stop);
+  RUN_TEST(test_buzzer_tone);
+  RUN_TEST(test_buzzer_deinit);
+  RUN_TEST(test_buzzer_Destroy);
 
   return UNITY_END();
 

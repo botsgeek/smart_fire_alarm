@@ -17,7 +17,7 @@ void tearDown(void)
   // clean stuff up here
 }
 
-void test_create(void){
+void test_lm75_create(void){
     lm75_config_t config = {
         .i2c_addr = 0x048,
         .mode = LM75_COMPARATOR_MODE,
@@ -77,7 +77,7 @@ void test_lm75_read(void){
 
 }
 
-void test_deinit(void){
+void test_lm75_deinit(void){
 
   lm75_config_t config1 = {
         .i2c_addr = 0x048,
@@ -102,7 +102,7 @@ void test_deinit(void){
 
 }
 
-void test_destroy(void){
+void test_lm75_destroy(void){
   error_type_t err = lm75_destroy(NULL);
   TEST_ASSERT_EQUAL(NULL_PARAMETER, err);
 
@@ -122,10 +122,10 @@ void test_destroy(void){
 
 int runUnityTest(void){
     UNITY_BEGIN();
-    RUN_TEST(test_create);
+    RUN_TEST(test_lm75_create);
     RUN_TEST(test_init_comparator_mode);
     RUN_TEST(test_lm75_read);
-    RUN_TEST(test_deinit);
+    RUN_TEST(test_lm75_deinit);
     RUN_TEST(test_destroy);
     return UNITY_END();
 }

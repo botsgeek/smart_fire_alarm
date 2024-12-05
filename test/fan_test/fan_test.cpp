@@ -16,7 +16,7 @@ void tearDown(void)
   // clean stuff up here
 }
 
-void test_create(void){
+void test_fan_create(void){
     fan_config_t config ={.fan_pin_number = 5};
     my_fan = fan_create(&config);
     TEST_ASSERT_NOT_EQUAL(NULL, my_fan);
@@ -79,7 +79,7 @@ void test_fan_deinit(void){
   free(my_fan);
 }
 
-void test_Destroy(void){
+void test_fan_Destroy(void){
   error_type_t err = destroy(NULL);
   TEST_ASSERT_EQUAL(NULL_PARAMETER, err);
   fan_config_t config = {.fan_pin_number = 3};
@@ -91,11 +91,11 @@ void test_Destroy(void){
 }
 int runUnityTests(void){
     UNITY_BEGIN();
-    RUN_TEST(test_create);
+    RUN_TEST(test_fan_create);
     RUN_TEST(test_fan_init);
     RUN_TEST(test_fan_speed);
     RUN_TEST(test_fan_deinit);
-    RUN_TEST(test_Destroy);
+    RUN_TEST(test_fan_Destroy);
     return UNITY_END();
 }
 void setup()
