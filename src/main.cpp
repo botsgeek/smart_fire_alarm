@@ -14,6 +14,7 @@
 #define FAN_ON_SPEED 255
 #define FAN_OFF_SPEED 0
 #define BUZZER_PWM_CYCLE 100
+#define SMS_TIME 600000 //send sms in 10min
 void fire_alarm_handler(state_t current_state);
 void water_alarm_handler(state_t current_state);
 // #include <Arduino_FreeRTOS.h>
@@ -66,6 +67,10 @@ state_machine_t* state_machine=NULL;
 void fire_alarm_handler(state_t current_state)
 {
   Serial.println("fireAlarm triggered");
+  static int counter = 0;
+  static int follow_up_counter = 1;
+  char phone_number[] = "+2347055587935"; // use actual phone number
+  char message[] = "Fire ALert ! ! !";
 switch (current_state)
         {
         case STATE_MACHINE_NORMAL_STATE:
@@ -89,9 +94,25 @@ switch (current_state)
             buzzer_start(buzzer, BUZZER_PWM_CYCLE);
             pump_on(pump);
             set_fanspeed(fan, FAN_ON_SPEED);
+            if (counter >= SMS_TIME)
+            {
+              
+              sim800_send_sms(sim800, phone_number, message);
+              delay(1000); //send sms after 1min delay
+              
+              
+            } 
+            counter++;
+            // follow up sms at 10min interval
+            if(follow_up_counter <= SMS_TIME)
+            {
+              follow_up_counter++;
+              sim800_send_sms(sim800, phone_number, message);
+              delay(600000);//send follow up sms after 10min delay 
+            }
+            
             Serial.println("in HEAT_AND_SMOKE state");
-            break;      
-                    
+            break;                 
         default:
             break;
         }
@@ -117,7 +138,7 @@ void setup()
       Serial.println("mq2 init create failed");
     exit(1);
   }
-
+ 
     //lm75 create and init
   lm75 = lm75_create(&lm75_config);
   if(!lm75){
@@ -176,7 +197,25 @@ void setup()
     exit(1);
   }
 
+//sim800 connect , reset and send sms
+  err = sim800_connect(sim800);
+    if (err != OK)
+    {
+      Serial.println("sim800 failed to connect");
+      exit(1);
+    }
 
+    err = sim800_reset(sim800);
+    if (err != OK)
+    {
+        Serial.println("should have reset now");
+        exit(1);
+    }
+    
+           
+     
+              
+// mq2 manager config, create and init
   mq2_manager_config_t mq2_manager_config = {
   .mq2_threshold = MQ2_THRESHOLD,
   .mq2_object = mq2,
@@ -192,6 +231,8 @@ if(err != OK){
   Serial.println("mq2 manager init create failed");
   exit(1);
 }
+
+// lm75 manager config, create and init
 lm75_manager_config_t lm75_manager_config = {
   .lm75_threshold = LM75_THRESHOLD,
   .lm75_obj = lm75,
@@ -208,9 +249,11 @@ if(err != OK){
   exit(1);
 }
 
+
+// state machine config, create and init
 state_config_t state_config = {
   .current_state = STATE_MACHINE_NORMAL_STATE,
-  .handler = water_alarm_handler
+  .handler = fire_alarm_handler
   
 };
 
@@ -236,6 +279,7 @@ void loop()
   if(err != OK){
     Serial.println("lm75 attempt to get threshold failed");
   }
+  
   err = mq2_manager_above_threshold(mq2_manager,&smoke);
   if(err != OK){
     Serial.println("mq2 attempt to get threshold failed");
