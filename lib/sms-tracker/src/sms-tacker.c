@@ -29,7 +29,9 @@ sms_tracker_t* sms_tracker_create(const sms_tracker_config_t* sms_config){
 
  error_type_t sms_tracker_init(sms_tracker_t* sms_obj){
     if (sms_obj == NULL)return NULL_PARAMETER;
+    sms_obj->initalize = true;
     sms_obj->has_sent_sms = true;
+
     return OK;
     
  }
