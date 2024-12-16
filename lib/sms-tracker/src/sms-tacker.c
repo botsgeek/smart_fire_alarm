@@ -4,8 +4,8 @@
 #include <stdbool.h>
 #include <common_headers.h>
 
-#define SMS_TIME 600000
-#define RESEND_TIME 600000
+#define SMS_TIME 30000
+#define RESEND_TIME 20
 
  struct sms_tracker_t {
     int sms_time_counter;
@@ -30,43 +30,29 @@ sms_tracker_t* sms_tracker_create(const sms_tracker_config_t* sms_config){
  error_type_t sms_tracker_init(sms_tracker_t* sms_obj){
     if (sms_obj == NULL)return NULL_PARAMETER;
     sms_obj->initalize = true;
-    sms_obj->has_sent_sms = true;
+    sms_obj->has_sent_sms = false;
 
     return OK;
     
  }
 
- void sms_tracker_handler(sms_tracker_t* sms_obj){
-    char phone_number[] = "+2347055587935"; // use actual phone number
-    char message[] = "Fire ALert ! ! !";
-    sms_obj->sms_time_counter++;
-    if (sms_obj->sms_time_counter >= SMS_TIME)
-    {
-         sim800_send_sms(sms_obj->sim800_obj,phone_number,message);
-        if (!sms_obj->has_sent_sms)
-        {
-            sim800_send_sms(sms_obj->sim800_obj,phone_number,message);
-        }else
-        {
-            sms_obj->follow_up_counter++;
-            if (sms_obj->follow_up_counter >= RESEND_TIME)
-             {
-                 sim800_send_sms(sms_obj->sim800_obj,phone_number,message);
-            }
-            
-        }
-        
-        
-    }
+void sms_tracker_reset_counter(sms_tracker_t*sms_obj){
+    
+        sms_obj->sms_time_counter = 0;
+        sms_obj->follow_up_counter = 0;
+        sms_obj->has_sent_sms = false;
     
  }
 
+ void sms_tracker_handler(sms_tracker_t* sms_obj){
+    
+ }
+
+
+
  error_type_t sms_tracker_deinit(sms_tracker_t*sms_obj){
     if(sms_obj == NULL)return NULL_PARAMETER;
-    if (sms_obj->initalize == false)
-    {
-        sms_obj->initalize = false;
-    }
+    sms_obj->initalize = false;
     return OK;  
  }
 

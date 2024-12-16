@@ -20,6 +20,7 @@ extern "C" {
     error_type_t sms_tracker_init(sms_tracker_t* sms_obj);
     error_type_t sms_tracker_deinit(sms_tracker_t*sms_obj);
     error_type_t sms_tracker_destroy(sms_tracker_t**sms_obj);
+    void sms_tracker_reset_counter(sms_tracker_t*sms_obj);
 
 #ifdef __cplusplus    
 }

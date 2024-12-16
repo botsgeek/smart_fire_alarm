@@ -64,13 +64,6 @@ mq2_manager_t* mq2_manager=NULL;
 
 state_machine_t* state_machine=NULL;
 
-sms_tracker_t* sms;
-sms_tracker_config_t sms_config = {
-  .sms_time_counter = 0,
-  .follow_up_counter = 1,
-  .sim800_obj= sim800,
-};
-
 void fire_alarm_handler(state_t current_state)
 {
   Serial.println("fireAlarm triggered");
