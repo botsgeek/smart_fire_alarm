@@ -8,13 +8,13 @@
 #include <mq2-manager.h>
 #include <sim800.h>
 #include <buzzer.h>
+#include <sms-tracker.h>
 #include <common_headers.h>
 #define MQ2_THRESHOLD 100
 #define LM75_THRESHOLD 30
 #define FAN_ON_SPEED 255
 #define FAN_OFF_SPEED 0
 #define BUZZER_PWM_CYCLE 100
-#define SMS_TIME 600000 //send sms in 10min
 void fire_alarm_handler(state_t current_state);
 void water_alarm_handler(state_t current_state);
 // #include <Arduino_FreeRTOS.h>
@@ -64,13 +64,16 @@ mq2_manager_t* mq2_manager=NULL;
 
 state_machine_t* state_machine=NULL;
 
+sms_tracker_t* sms;
+sms_tracker_config_t sms_config = {
+  .sms_time_counter = 0,
+  .follow_up_counter = 1,
+  .sim800_obj= sim800,
+};
+
 void fire_alarm_handler(state_t current_state)
 {
   Serial.println("fireAlarm triggered");
-  static int counter = 0;
-  static int follow_up_counter = 1;
-  char phone_number[] = "+2347055587935"; // use actual phone number
-  char message[] = "Fire ALert ! ! !";
 switch (current_state)
         {
         case STATE_MACHINE_NORMAL_STATE:
@@ -94,23 +97,7 @@ switch (current_state)
             buzzer_start(buzzer, BUZZER_PWM_CYCLE);
             pump_on(pump);
             set_fanspeed(fan, FAN_ON_SPEED);
-            if (counter >= SMS_TIME)
-            {
-              
-              sim800_send_sms(sim800, phone_number, message);
-              delay(1000); //send sms after 1min delay
-              
-              
-            } 
-            counter++;
-            // follow up sms at 10min interval
-            if(follow_up_counter <= SMS_TIME)
-            {
-              follow_up_counter++;
-              sim800_send_sms(sim800, phone_number, message);
-              delay(600000);//send follow up sms after 10min delay 
-            }
-            
+            sms_tracker_handler(sms);
             Serial.println("in HEAT_AND_SMOKE state");
             break;                 
         default:
