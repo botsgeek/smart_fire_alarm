@@ -14,7 +14,8 @@
 #define FAN_ON_SPEED 255
 #define FAN_OFF_SPEED 0
 #define BUZZER_PWM_CYCLE 100
-#define SMS_TIME 600000 //send sms in 10min
+#define SMS_TIME 30000 //send sms in 10min
+#define RESEND_TIME 20
 void fire_alarm_handler(state_t current_state);
 void water_alarm_handler(state_t current_state);
 // #include <Arduino_FreeRTOS.h>
@@ -63,54 +64,81 @@ mq2_manager_t* mq2_manager=NULL;
 
 
 state_machine_t* state_machine=NULL;
+ struct sms_tracker_t {
+    int sms_time_counter;
+    int follow_up_counter;
+    bool has_sent_sms;
+};
+
+
+void sms_tracker_handler(sms_tracker_t* sms_trk_obj){
+ char phone_number[] = "+2347055587935"; // use actual phone number
+    char message[] = "Fire ALert ! ! !";
+    sms_trk_obj->sms_time_counter++;
+    delay(1);
+    if (sms_trk_obj->sms_time_counter >= SMS_TIME)
+    {
+        if (!sms_trk_obj->has_sent_sms)
+        {
+            sim800_send_sms(sim800,phone_number,message);
+        }else
+        {
+            sms_trk_obj->follow_up_counter++; // sms counter is more than 300000
+            sms_trk_obj->sms_time_counter = 0; // if sms conter reach 0 it should 
+                                           //enter the loop below onces                  
+            if (sms_trk_obj->follow_up_counter >= RESEND_TIME)
+             {
+                 sim800_send_sms(sim800,phone_number,message);
+                 sms_trk_obj->follow_up_counter =0;
+            }   
+        }   
+    }
+    delay(1);  
+    
+    //Reset the sms_handler;    
+}
+void sms_reset_tracker(sms_tracker_t* sms_trk_obj){
+  if (sms_trk_obj != NULL)
+  {
+    sms_trk_obj->sms_time_counter = 0;
+    sms_trk_obj->follow_up_counter = 0;
+    sms_trk_obj->has_sent_sms = false;
+  }
+
+}
 
 void fire_alarm_handler(state_t current_state)
 {
   Serial.println("fireAlarm triggered");
-  static int counter = 0;
-  static int follow_up_counter = 1;
-  char phone_number[] = "+2347055587935"; // use actual phone number
-  char message[] = "Fire ALert ! ! !";
+  sms_tracker_t sms_tracker;
+  
 switch (current_state)
         {
         case STATE_MACHINE_NORMAL_STATE:
             buzzer_stop(buzzer);
             pump_off(pump);
-            set_fanspeed(fan, FAN_OFF_SPEED); 
+            set_fanspeed(fan, FAN_OFF_SPEED);
+            sms_reset_tracker(&sms_tracker); 
             Serial.println("in normal state");
             break;
         case STATE_MACHINE_HEAT_NO_SMOKE:
             buzzer_start(buzzer, BUZZER_PWM_CYCLE);
             pump_on(pump);
             set_fanspeed(fan, FAN_ON_SPEED); 
+            sms_reset_tracker(&sms_tracker);
             Serial.println("in HEAT_NO_SMOKE state");
             break;
         case STATE_MACHINE_SMOKE_NO_HEAT:
             buzzer_start(buzzer, BUZZER_PWM_CYCLE);
             set_fanspeed(fan, FAN_ON_SPEED);
+            sms_reset_tracker(&sms_tracker);
             Serial.println("in SMOKE_NO_HEAT state");
             break;  
         case STATE_MACHINE_HEAT_AND_SMOKE:
             buzzer_start(buzzer, BUZZER_PWM_CYCLE);
             pump_on(pump);
             set_fanspeed(fan, FAN_ON_SPEED);
-            if (counter >= SMS_TIME)
-            {
-              
-              sim800_send_sms(sim800, phone_number, message);
-              delay(1000); //send sms after 1min delay
-              
-              
-            } 
-            counter++;
-            // follow up sms at 10min interval
-            if(follow_up_counter <= SMS_TIME)
-            {
-              follow_up_counter++;
-              sim800_send_sms(sim800, phone_number, message);
-              delay(600000);//send follow up sms after 10min delay 
-            }
-            
+            sms_tracker_handler(&sms_tracker);
             Serial.println("in HEAT_AND_SMOKE state");
             break;                 
         default:
@@ -118,9 +146,9 @@ switch (current_state)
         }
 
 }
-void water_alarm_handler(state_t current_state){
-  Serial.println("Water alarm triggered");
-}
+// void water_alarm_handler(state_t current_state){
+//   Serial.println("Water alarm triggered");
+// }
 void setup()
 {
   error_type_t err;
