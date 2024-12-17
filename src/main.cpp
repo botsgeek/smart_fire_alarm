@@ -95,8 +95,9 @@ void sms_tracker_handler(sms_tracker_t* sms_trk_obj){
     }
     delay(1);  
     
-    //Reset the sms_handler;    
+       
 }
+//Reset the sms_handler; 
 void sms_reset_tracker(sms_tracker_t* sms_trk_obj){
   if (sms_trk_obj != NULL)
   {
