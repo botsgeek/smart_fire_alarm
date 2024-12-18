@@ -125,6 +125,7 @@ error_type_t mq2_analog_read(mq2_t *mq2_object, uint16_t *value_ptr){
         return INVALID_MODE;
     }
     *value_ptr = analogRead(mq2_object->analog_pin_number);
+    Serial.print("mq2 value is:");
     Serial.println(*value_ptr);
     Serial.println("analog reading is sucessful");
     return OK;
