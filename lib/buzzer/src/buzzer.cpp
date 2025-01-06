@@ -51,7 +51,11 @@ error_type_t buzzer_start(buzzer_t* buzzer_object, uint8_t pwm_duty_cycle) {
         return INVALID_STATE;
 
     }
-    
+    // Serial.println("This is  buzzer pwm duty cycle ");
+    // Serial.println(pwm_duty_cycle);
+    // Serial.println("This is  buzzer on pin number ");
+    // Serial.println(buzzer_object->buzzer_pin);
+        //Serial.println("This is the buzzer on %d and pin number %d\n",buzzer_object->buzzer_pin,pwm_duty_cycle);
         analogWrite(buzzer_object->buzzer_pin, pwm_duty_cycle);
         return OK;
   
@@ -66,7 +70,9 @@ error_type_t buzzer_stop(buzzer_t* buzzer_object) {
         return INVALID_STATE;
 
     }
-    
+    // Serial.println("This is  buzzer on pin number ");
+    // Serial.println(buzzer_object->buzzer_pin);
+    //Serial.println("This is  buzzer off pin number %d\n",buzzer_object->buzzer_pin);
         analogWrite(buzzer_object->buzzer_pin, 0);
         return OK;
 }

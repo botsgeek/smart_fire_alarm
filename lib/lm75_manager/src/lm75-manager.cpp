@@ -33,6 +33,7 @@ error_type_t lm75_manager_init(lm75_manager_t* lm75_manager){
 }
 
 error_type_t lm75_manager_above_threshold(lm75_manager_t* lm75_manager, bool* state){
+     //char buffer[100];
     if (lm75_manager == NULL)return NULL_PARAMETER;
     if(!lm75_manager->initialize)return INVALID_STATE;
     float currentTemp = lm75_read(lm75_manager->lm75_obj);
@@ -40,9 +41,13 @@ error_type_t lm75_manager_above_threshold(lm75_manager_t* lm75_manager, bool* st
     Serial.println(currentTemp);
     if (currentTemp > lm75_manager->threshold)
     {
+        // sprintf(buffer,"above lm75 threshold  %d\n",*state);
+        // Serial.print(buffer);
         *state = true;
     }else
     {
+        // sprintf(buffer,"below lm75 threshold  %d\n",*state);
+        //  Serial.print(buffer);
         *state = false;
     }
     
