@@ -9,22 +9,25 @@
 #include <sim800.h>
 #include <buzzer.h>
 #include <common_headers.h>
-#define MQ2_THRESHOLD 100
-#define LM75_THRESHOLD 30
+#include <print.h>
+#define MQ2_THRESHOLD 200
+#define LM75_THRESHOLD 20
 #define FAN_ON_SPEED 255
 #define FAN_OFF_SPEED 0
 #define BUZZER_PWM_CYCLE 100
-#define SMS_TIME 30000 //send sms in 10min
-#define RESEND_TIME 20
+#define SMS_TIME 10 //send sms in 10min
+#define RESEND_TIME 20 
+constexpr  char*  PHONE_NUMBER = "+2347055587935";
+constexpr   char * MESSAGE  = "Fire ALert ! ! !";
 void fire_alarm_handler(state_t current_state);
 void water_alarm_handler(state_t current_state);
-// #include <Arduino_FreeRTOS.h>
+
 buzzer_config_t buzzer_config = {
                                     .buzzer_pin = 3}; buzzer_t *
                                 buzzer;
 
 fan_config_t fan_config = {
-    .fan_pin_number = 4};
+    .fan_pin_number = 9};
 
 fan_t *fan=NULL;
 
@@ -35,7 +38,7 @@ pump_config_t pump_config = {
                             pump;
 
 mq2_config_t mq2_config = {
-    .analog_pin_number = A0,
+    .analog_pin_number = A3,
     .digital_pin_number = 6,
     .mode = MQ2_HYBRID};
 
@@ -72,15 +75,18 @@ state_machine_t* state_machine=NULL;
 
 
 void sms_tracker_handler(sms_tracker_t* sms_trk_obj){
- char phone_number[] = "+2347055587935"; // use actual phone number
-    char message[] = "Fire ALert ! ! !";
+  Serial.println(F("tracking sms handler"));
+    
     sms_trk_obj->sms_time_counter++;
     delay(1);
+    Serial.println(F("entering the sms loop"));
     if (sms_trk_obj->sms_time_counter >= SMS_TIME)
     {
+       debug_printf("send sms value %d\n",(int)sms_trk_obj);
         if (!sms_trk_obj->has_sent_sms)
         {
-            sim800_send_sms(sim800,phone_number,message);
+           debug_printf(" failed sms value %d\n", sms_trk_obj);
+            sim800_send_sms(sim800,PHONE_NUMBER,MESSAGE);
         }else
         {
             sms_trk_obj->follow_up_counter++; // sms counter is more than 300000
@@ -88,7 +94,9 @@ void sms_tracker_handler(sms_tracker_t* sms_trk_obj){
                                            //enter the loop below onces                  
             if (sms_trk_obj->follow_up_counter >= RESEND_TIME)
              {
-                 sim800_send_sms(sim800,phone_number,message);
+                 debug_printf("sms resend value %d\n",(int)sms_trk_obj);
+
+                 sim800_send_sms(sim800,PHONE_NUMBER,MESSAGE);
                  sms_trk_obj->follow_up_counter =0;
             }   
         }   
@@ -97,6 +105,7 @@ void sms_tracker_handler(sms_tracker_t* sms_trk_obj){
     
        
 }
+
 //Reset the sms_handler; 
 void sms_reset_tracker(sms_tracker_t* sms_trk_obj){
   if (sms_trk_obj != NULL)
@@ -110,9 +119,11 @@ void sms_reset_tracker(sms_tracker_t* sms_trk_obj){
 
 void fire_alarm_handler(state_t current_state)
 {
-  Serial.println("fireAlarm triggered");
+  //Serial.println(F("fireAlarm triggered");
   sms_tracker_t sms_tracker;
-  
+  Serial.println(F("This is  the state value "));
+    Serial.println(current_state);
+  //Serial.print("This is the state value %d\n",(int)current_state);
 switch (current_state)
         {
         case STATE_MACHINE_NORMAL_STATE:
@@ -120,27 +131,28 @@ switch (current_state)
             pump_off(pump);
             set_fanspeed(fan, FAN_OFF_SPEED);
             sms_reset_tracker(&sms_tracker); 
-            Serial.println("in normal state");
+            Serial.println(F("in normal state"));
             break;
         case STATE_MACHINE_HEAT_NO_SMOKE:
             buzzer_start(buzzer, BUZZER_PWM_CYCLE);
             pump_on(pump);
             set_fanspeed(fan, FAN_ON_SPEED); 
             sms_reset_tracker(&sms_tracker);
-            Serial.println("in HEAT_NO_SMOKE state");
+            Serial.println(F("in HEAT_NO_SMOKE state"));
             break;
         case STATE_MACHINE_SMOKE_NO_HEAT:
+            Serial.println(F("entering the smoke state"));
             buzzer_start(buzzer, BUZZER_PWM_CYCLE);
             set_fanspeed(fan, FAN_ON_SPEED);
             sms_reset_tracker(&sms_tracker);
-            Serial.println("in SMOKE_NO_HEAT state");
+            Serial.println(F("in SMOKE_NO_HEAT state"));
             break;  
         case STATE_MACHINE_HEAT_AND_SMOKE:
             buzzer_start(buzzer, BUZZER_PWM_CYCLE);
             pump_on(pump);
             set_fanspeed(fan, FAN_ON_SPEED);
             sms_tracker_handler(&sms_tracker);
-            Serial.println("in HEAT_AND_SMOKE state");
+            Serial.println(F("in HEAT_AND_SMOKE state"));
             break;                 
         default:
             break;
@@ -148,7 +160,7 @@ switch (current_state)
 
 }
 // void water_alarm_handler(state_t current_state){
-//   Serial.println("Water alarm triggered");
+//   Serial.println(F("Water alarm triggered");
 // }
 void setup()
 {
@@ -159,64 +171,76 @@ void setup()
   //mq2 create and init
   mq2 = mq2_create(&mq2_config);
   if(!mq2){
-    Serial.println("mq2 create failed");
+    Serial.println(F("mq2 create failed"));
     exit(1);
   }
   err = mq2_init(mq2);
   if(err != OK){
-      Serial.println("mq2 init create failed");
+      Serial.println(F("mq2 init create failed"));
     exit(1);
   }
  
     //lm75 create and init
   lm75 = lm75_create(&lm75_config);
   if(!lm75){
-    Serial.println("lm75 create failed");
+    Serial.println(F("lm75 create failed"));
     exit(1);
   }
   err = lm75_init_comparator_mode(lm75);
   if(err != OK){
-    Serial.println("lm75  init create failed");
+    Serial.println(F("lm75  init create failed"));
     exit(1);
   }
 
     //buzzer create and init
   buzzer = buzzer_create(&buzzer_config);
   if(!buzzer){
-    Serial.println("buzzer create failed");
+    Serial.println(F("buzzer create failed"));
     exit(1);
   }
   err = buzzer_init(buzzer);
   if(err != OK){
-    Serial.println("buzzer init create failed");
+    Serial.println(F("buzzer init create failed"));
     exit(1);
   }
+  //  buzzer_start(buzzer, BUZZER_PWM_CYCLE);
+  //  Serial.println(F("buzzer is on");
 
     //pump create and init
   pump = pump_create(&pump_config);
   if(!pump){
-    Serial.println("pump create failed");
+    Serial.println(F("pump create failed"));
     exit(1);
   }
   err = pump_init(pump);
   if(err != OK){
-    Serial.println("pump init create failed");
+    Serial.println(F("pump init create failed"));
     exit(1);
   }
+  // pump_on(pump);
+  // Serial.println(F("pump is on");
+
+
 
     //fan create and init
   fan = fan_create(&fan_config);
   if(!fan){
-    Serial.println("fan create failed");
+    Serial.println(F("fan create failed"));
     exit(1);
   }
   err = fan_init(fan);
   if(err != OK){
-      Serial.println("fan init create failed");
+      Serial.println(F("fan init create failed"));
     exit(1);
   }
 
+  // err = set_fanspeed(fan, FAN_ON_SPEED);
+  // Serial.println(F("fan is on high speed");
+    
+  
+
     //sim800 create and init
+   
   sim800 = sim800_create(&sim800_config);
   if(!sim800){
     exit(1);
@@ -225,25 +249,13 @@ void setup()
   if(err != OK){
     exit(1);
   }
+   err = sim800_connect(sim800);
+   Serial.println(F("connected"));
+  
+ 
 
-//sim800 connect , reset and send sms
-  err = sim800_connect(sim800);
-    if (err != OK)
-    {
-      Serial.println("sim800 failed to connect");
-      exit(1);
-    }
 
-    err = sim800_reset(sim800);
-    if (err != OK)
-    {
-        Serial.println("should have reset now");
-        exit(1);
-    }
-    
            
-     
-              
 // mq2 manager config, create and init
   mq2_manager_config_t mq2_manager_config = {
   .mq2_threshold = MQ2_THRESHOLD,
@@ -252,12 +264,12 @@ void setup()
 
 mq2_manager = mq2_manager_create(&mq2_manager_config);
 if(!mq2_manager){
-  Serial.println("mq2 manager create failed");
+  Serial.println(F("mq2 manager create failed"));
   exit(1);
 }
 err = mq2_manager_init(mq2_manager);
 if(err != OK){
-  Serial.println("mq2 manager init create failed");
+  Serial.println(F("mq2 manager init create failed"));
   exit(1);
 }
 
@@ -269,17 +281,17 @@ lm75_manager_config_t lm75_manager_config = {
 
 lm75_manager = lm75_manager_create(&lm75_manager_config);
 if(!lm75_manager){
-  Serial.println("lm75 manager create failed");
+  Serial.println(F("lm75 manager create failed"));
   exit(1);
 }
 err = lm75_manager_init(lm75_manager);
 if(err != OK){
-  Serial.println("lm75 manager init create failed");
+  Serial.println(F("lm75 manager init create failed"));
   exit(1);
 }
 
 
-// state machine config, create and init
+//state machine config, create and init
 state_config_t state_config = {
   .current_state = STATE_MACHINE_NORMAL_STATE,
   .handler = fire_alarm_handler
@@ -288,12 +300,12 @@ state_config_t state_config = {
 
 state_machine = state_machine_create(&state_config);
 if(!state_machine){
-  Serial.println("state_machine create failed");
+  Serial.println(F("state_machine create failed"));
   exit(1);
 }
 err = state_machine_init(state_machine);
 if(err != OK){
-  Serial.println("state_machine init create failed");
+  Serial.println(F("state_machine init create failed"));
   exit(1);
 }
 
@@ -306,17 +318,18 @@ void loop()
   error_type_t err;
   err = lm75_manager_above_threshold(lm75_manager,&heat);
   if(err != OK){
-    Serial.println("lm75 attempt to get threshold failed");
+    Serial.println(F("lm75 attempt to get threshold failed"));
   }
+
   
   err = mq2_manager_above_threshold(mq2_manager,&smoke);
   if(err != OK){
-    Serial.println("mq2 attempt to get threshold failed");
+    Serial.println(F("mq2 attempt to get threshold failed"));
   }
 
   err = state_machine_transition(state_machine,heat,smoke);
   if(err != OK){
-    Serial.println("state machine transition failed");
+    Serial.println(F("state machine transition failed"));
   }
   delay(1000);
   // put your main code here, to run repeatedly:

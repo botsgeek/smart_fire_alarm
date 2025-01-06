@@ -3,7 +3,7 @@
 #include "common_headers.h"
 #include <stdbool.h>
 
-#define MAX_FAN_PIN_NUMBER 5
+#define MAX_FAN_PIN_NUMBER 9
 #define MIN_FAN_PIN_NUMBER 3
 
 
@@ -48,7 +48,11 @@ error_type_t set_fanspeed(fan_t* fan_object,  uint8_t fanspeed){
       
         return INVALID_STATE;
     }
-      
+    // Serial.println("This is  the fanspeed");
+    // Serial.println(fanspeed);
+    // Serial.println("This is  fan pin number ");
+    // Serial.println(fan_object->fan_pin_number);
+      //Serial.println("This is the fan speed %d and pin number %d\n",fanspeed,fan_object->fan_pin_number);
     analogWrite(fan_object->fan_pin_number, fanspeed);
     
     return OK;

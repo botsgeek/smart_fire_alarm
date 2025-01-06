@@ -3,6 +3,7 @@
 #include <mq2.h>
 #include <common_headers.h>
 #include <stdbool.h>
+#include <print.h>
 
 struct mq2_manager_t
 {
@@ -30,15 +31,24 @@ error_type_t mq2_manager_init(mq2_manager_t* mq2_manager){
 }
 
 error_type_t mq2_manager_above_threshold(mq2_manager_t* mq2_manager, bool* state){
+     //char buffer[100];
+  
     if(mq2_manager == NULL)return NULL_PARAMETER;
     if(!mq2_manager->initialize)return INVALID_STATE;
      uint16_t value;
-    float mq2_read = mq2_analog_read(mq2_manager->mq2_obj, &value);
-        if (mq2_read > mq2_manager->mq2_threshold)
+     mq2_analog_read(mq2_manager->mq2_obj, &value);
+        if (value > mq2_manager->mq2_threshold)
     {
+        Serial.print("entering the comparing threshold state");
+         debug_printf("above mq2 thres %d\n",(int)*state);
+        // sprintf(buffer,"above mq2 threshold %d\n",*state);
+        //  Serial.print(buffer);
         *state = true;
     }else
     {
+        //  debug_printf("below mq2 thres %d\n",(int)*state);
+        // sprintf(buffer,"below mq2 threshold %d\n",*state);
+        // Serial.print(buffer);
         *state = false;
     }
     

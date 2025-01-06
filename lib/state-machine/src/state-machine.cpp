@@ -1,11 +1,12 @@
 #include <Arduino.h>
+#include <stdio.h>
 #include <state-machine.h>
 #include <buzzer.h>
 #include <fan-driver.h>
 #include <pump-driver.h>
 #include <lm75-manager.h>
 #include <mq2-manager.h>
-
+#include <print.h>
 struct state_machine_t
 {
     state_t current_state;
@@ -48,18 +49,55 @@ error_type_t state_machine_destroy(state_machine_t** state_obj){
 }
 
 static void handle_transition(state_machine_t* state_obj, const bool heat, const bool smoke){
+    debug_printf("heat value is fhfdjhfd %d\n",(int)heat);
+    //debug_printf("heat value %d\n",(int)heat);
+    // static char buffer[50];
+    // memset(buffer,0,50);
+    // sprintf(buffer,"heat value %d\n",(int)heat);
+    //Serial.println(buffer);
+    //  memset(buffer,0,100);
+    //  sprintf(buffer,"smoke value %d\n",(int)smoke);
+    // Serial.println(buffer);
+    //          Serial.println("heat value");
+        //Serial.println((String)(int)heat);
+    Serial.println("git inside handle_transition");
+    //Serial.println("heat value is: "+);
     if(!heat && !smoke)return;
+
     if(heat && !smoke){
+        Serial.println("transition to heat state is successful");
+        //  debug_printf("heat value %d\n",(int)heat);
+        //   debug_printf("Smoke value %d\n",(int)smoke);
+        //  sprintf("heat value %d\n", (int)heat);
+        //  Serial.println(buffer);
+        // sprintf("no smoke value %d\n", (int)heat);
+        //  Serial.println(buffer);
         state_obj->current_state = STATE_MACHINE_HEAT_NO_SMOKE;
         return;
     }
+    
     if (!heat && smoke)
     {
+        Serial.println("transition to smoke state is successful");
+        debug_printf("smoke value %d\n",(int)smoke);
+        //  debug_printf("Heat value %d\n",(int)heat);
+        //   debug_printf("smoke value %d\n",(int)smoke);
+        //  sprintf(" no heat value %d\n", heat);
+        //  sprintf("smokevalue %d\n", smoke);
+         //Serial.println(buffer);
         state_obj->current_state = STATE_MACHINE_SMOKE_NO_HEAT;
         return;
     }
+    
     if (heat && smoke)
     {
+        Serial.println("transition to smoke state is successful");
+        //  debug_printf("heat value %d\n",(int)heat);
+        //   debug_printf("smoke value %d\n",(int)heat);
+        //   sprintf("  heat value %d\n", heat);
+        //    Serial.println(buffer);
+        // sprintf("smokevalue %d\n", smoke);
+        //  Serial.println(buffer);
         state_obj->current_state = STATE_MACHINE_HEAT_AND_SMOKE;
         return;
     }

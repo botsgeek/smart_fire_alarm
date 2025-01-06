@@ -50,6 +50,9 @@ error_type_t pump_on(pump_t* pump_object){
     {
         return INVALID_STATE;
     }
+    // Serial.println("This is  pump on pin number ");
+    // Serial.println(pump_object->pump_pin_number);
+    //Serial.printf("This is  pump on pin number %d\n",pump_object->pump_pin_number);
     digitalWrite(pump_object->pump_pin_number, HIGH);
     
     return OK;
@@ -66,6 +69,9 @@ error_type_t pump_off(pump_t* pump_object){
     
         return INVALID_STATE;
     }
+    // Serial.println("This is  pump off pin number ");
+    // Serial.println(pump_object->pump_pin_number);
+    //Serial.println("Turning pump off,number pin  %d\n",pump_object->pump_pin_number);
     digitalWrite(pump_object->pump_pin_number, LOW);
 
     return OK;

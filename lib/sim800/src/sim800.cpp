@@ -13,7 +13,7 @@ static const uint8_t ACCEPTABLE_RX_PIN[] = {2, 3, 10};
 static const uint8_t ACCEPTABLE_RX_PIN[] = {0, 1, 2, 3};
 #endif
 #define MAX_TIMEOUT (0x10000000UL)
-#define READ_BUFFER_SIZE (256U)
+#define READ_BUFFER_SIZE (127U)
 #define EXTRA_CHAR_COUNT (2U)
 #define MESSAGE_SEND_BUFFER_SIZE (255U)
 #define SEND_SMS_DELAY (60000U)
