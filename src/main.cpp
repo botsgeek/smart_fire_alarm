@@ -10,15 +10,12 @@
 #include <buzzer.h>
 #include <common_headers.h>
 #include <print.h>
-#define MQ2_THRESHOLD 200
-#define LM75_THRESHOLD 20
+#include <sms-timer.h>
+#define MQ2_THRESHOLD 500
+#define LM75_THRESHOLD 49
 #define FAN_ON_SPEED 255
 #define FAN_OFF_SPEED 0
 #define BUZZER_PWM_CYCLE 100
-#define SMS_TIME 10 //send sms in 10min
-#define RESEND_TIME 20 
-constexpr  char*  PHONE_NUMBER = "+2347055587935";
-constexpr   char * MESSAGE  = "Fire ALert ! ! !";
 void fire_alarm_handler(state_t current_state);
 void water_alarm_handler(state_t current_state);
 
@@ -44,7 +41,7 @@ mq2_config_t mq2_config = {
 
 mq2_t *mq2=NULL;
 lm75_config_t lm75_config = {
-  .i2c_addr = 0x48,
+  .i2c_addr = 0x49,
   .mode = LM75_COMPARATOR_MODE, 
   .os_pin_number = 2, 
   .polarity = LM75_POLARITY_ACTIVE_HIGH,
@@ -67,60 +64,60 @@ mq2_manager_t* mq2_manager=NULL;
 
 
 state_machine_t* state_machine=NULL;
- struct sms_tracker_t {
-    int sms_time_counter;
-    int follow_up_counter;
-    bool has_sent_sms;
-};
+
+sms_tracker_t* sms_trk;
+ 
+ 
 
 
-void sms_tracker_handler(sms_tracker_t* sms_trk_obj){
-  Serial.println(F("tracking sms handler"));
+// void sms_tracker_handler(sms_tracker_t* sms_trk_obj){
+//   Serial.println(F("tracking sms handler"));
+//   unsigned long  entering_time = millis();
+//   unsigned long last_time = 0;
     
-    sms_trk_obj->sms_time_counter++;
-    delay(1);
-    Serial.println(F("entering the sms loop"));
-    if (sms_trk_obj->sms_time_counter >= SMS_TIME)
-    {
-       debug_printf("send sms value %d\n",(int)sms_trk_obj);
-        if (!sms_trk_obj->has_sent_sms)
-        {
-           debug_printf(" failed sms value %d\n", sms_trk_obj);
-            sim800_send_sms(sim800,PHONE_NUMBER,MESSAGE);
-        }else
-        {
-            sms_trk_obj->follow_up_counter++; // sms counter is more than 300000
-            sms_trk_obj->sms_time_counter = 0; // if sms conter reach 0 it should 
-                                           //enter the loop below onces                  
-            if (sms_trk_obj->follow_up_counter >= RESEND_TIME)
-             {
-                 debug_printf("sms resend value %d\n",(int)sms_trk_obj);
+//     if (entering_time - last_time >= 1)
+//     {
+//       last_time = current_time; 
+//       sms_trk_obj->sms_time_counter++;
+//     }
+    
+//     // sms_trk_obj->sms_time_counter++;
+//     // delay(1);
+//     Serial.println(F("entering the sms loop"));
+//     if (sms_trk_obj->sms_time_counter >= SMS_TIME)
+//     {
+//        debug_printf("send sms value %d\n",(int)sms_trk_obj);
+//         if (!sms_trk_obj->has_sent_sms)
+//         {
+//            debug_printf(" failed sms value %d\n", sms_trk_obj);
+//             sim800_send_sms(sim800,PHONE_NUMBER,MESSAGE);
+//         }else
+//         {
+//             sms_trk_obj->follow_up_counter++; // sms counter is more than 300000
+//             sms_trk_obj->sms_time_counter = 0; // if sms conter reach 0 it should 
+//                                            //enter the loop below onces                  
+//             if (sms_trk_obj->follow_up_counter >= RESEND_TIME)
+//              {
+//                  debug_printf("sms resend value %d\n",(int)sms_trk_obj);
 
-                 sim800_send_sms(sim800,PHONE_NUMBER,MESSAGE);
-                 sms_trk_obj->follow_up_counter =0;
-            }   
-        }   
-    }
-    delay(1);  
+//                  sim800_send_sms(sim800,PHONE_NUMBER,MESSAGE);
+//                  sms_trk_obj->follow_up_counter =0;
+//             }   
+//         }   
+//     }
+//     // delay(1);  
     
        
-}
+// }
 
-//Reset the sms_handler; 
-void sms_reset_tracker(sms_tracker_t* sms_trk_obj){
-  if (sms_trk_obj != NULL)
-  {
-    sms_trk_obj->sms_time_counter = 0;
-    sms_trk_obj->follow_up_counter = 0;
-    sms_trk_obj->has_sent_sms = false;
-  }
 
-}
+
+
 
 void fire_alarm_handler(state_t current_state)
 {
   //Serial.println(F("fireAlarm triggered");
-  sms_tracker_t sms_tracker;
+  // sms_tracker_t sms_tracker;
   Serial.println(F("This is  the state value "));
     Serial.println(current_state);
   //Serial.print("This is the state value %d\n",(int)current_state);
@@ -130,28 +127,28 @@ switch (current_state)
             buzzer_stop(buzzer);
             pump_off(pump);
             set_fanspeed(fan, FAN_OFF_SPEED);
-            sms_reset_tracker(&sms_tracker); 
+            sms_reset_tracker(sms_trk); 
             Serial.println(F("in normal state"));
             break;
         case STATE_MACHINE_HEAT_NO_SMOKE:
             buzzer_start(buzzer, BUZZER_PWM_CYCLE);
             pump_on(pump);
             set_fanspeed(fan, FAN_ON_SPEED); 
-            sms_reset_tracker(&sms_tracker);
+            sms_reset_tracker(sms_trk);
             Serial.println(F("in HEAT_NO_SMOKE state"));
             break;
         case STATE_MACHINE_SMOKE_NO_HEAT:
             Serial.println(F("entering the smoke state"));
             buzzer_start(buzzer, BUZZER_PWM_CYCLE);
             set_fanspeed(fan, FAN_ON_SPEED);
-            sms_reset_tracker(&sms_tracker);
+            sms_reset_tracker(sms_trk);
             Serial.println(F("in SMOKE_NO_HEAT state"));
             break;  
         case STATE_MACHINE_HEAT_AND_SMOKE:
             buzzer_start(buzzer, BUZZER_PWM_CYCLE);
             pump_on(pump);
             set_fanspeed(fan, FAN_ON_SPEED);
-            sms_tracker_handler(&sms_tracker);
+            sms_tracker_handler(sms_trk);
             Serial.println(F("in HEAT_AND_SMOKE state"));
             break;                 
         default:
@@ -217,8 +214,7 @@ void setup()
     Serial.println(F("pump init create failed"));
     exit(1);
   }
-  // pump_on(pump);
-  // Serial.println(F("pump is on");
+  
 
 
 
@@ -233,29 +229,36 @@ void setup()
       Serial.println(F("fan init create failed"));
     exit(1);
   }
-
-  // err = set_fanspeed(fan, FAN_ON_SPEED);
-  // Serial.println(F("fan is on high speed");
-    
   
 
+
+    
+  
     //sim800 create and init
    
   sim800 = sim800_create(&sim800_config);
   if(!sim800){
+    debug_printf("sim800 create failed");
     exit(1);
   }
   err = sim800_init(sim800);
   if(err != OK){
-    exit(1);
+    debug_printf("sidm800 init create failed");
+    sim800_reset(sim800);
+    //exit(1);
   }
    err = sim800_connect(sim800);
-   Serial.println(F("connected"));
-  
- 
+   if (err != OK) {
+    Serial.print(F("Connection failed with error code: "));
+    Serial.println(err);
+    sim800_reset(sim800);
+} else {
+    Serial.println(F("SIM800 connected successfully"));
+}
 
 
-           
+   
+         
 // mq2 manager config, create and init
   mq2_manager_config_t mq2_manager_config = {
   .mq2_threshold = MQ2_THRESHOLD,
@@ -288,6 +291,17 @@ err = lm75_manager_init(lm75_manager);
 if(err != OK){
   Serial.println(F("lm75 manager init create failed"));
   exit(1);
+}
+
+sms_config_t sms_config = {
+  .sms800_obj = sim800,
+  .current_state = NORMAL,
+  
+ };
+
+sms_trk = sms_tracker_create(&sms_config);
+if(!sms_trk){
+  Serial.println("sms tracker create failed ");
 }
 
 
