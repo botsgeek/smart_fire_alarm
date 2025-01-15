@@ -5,11 +5,7 @@
 extern "C" {
 #endif
 #include <common_headers.h>
-#include <buzzer.h>
-#include <fan-driver.h>
-#include <pump-driver.h>
-#include <lm75-manager.h>
-#include <mq2-manager.h>
+
 
 typedef struct state_machine_t state_machine_t;
 
@@ -31,20 +27,11 @@ typedef struct{
     
 }state_config_t;
 
-
-
-
-
 state_machine_t* state_machine_create(const state_config_t* state_config);
 error_type_t state_machine_init(state_machine_t* state_obj);
 error_type_t state_machine_deinit(state_machine_t* state_obj);
 error_type_t state_machine_destroy(state_machine_t** state_obj);
 error_type_t state_machine_transition(state_machine_t* state_obj, const bool heat, const bool smoke);
-
-
-
-
-
 
 
 #ifdef __cplusplus

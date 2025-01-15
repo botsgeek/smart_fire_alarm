@@ -1,11 +1,6 @@
 #include <Arduino.h>
 #include <stdio.h>
 #include <state-machine.h>
-#include <buzzer.h>
-#include <fan-driver.h>
-#include <pump-driver.h>
-#include <lm75-manager.h>
-#include <mq2-manager.h>
 #include <print.h>
 struct state_machine_t
 {
@@ -49,7 +44,7 @@ error_type_t state_machine_destroy(state_machine_t** state_obj){
 }
 
 static void handle_transition(state_machine_t* state_obj, const bool heat, const bool smoke){
-    debug_printf("heat value is fhfdjhfd %d\n",(int)heat);
+    //debug_printf("heat value is fhfdjhfd %d\n",(int)heat);
     //debug_printf("heat value %d\n",(int)heat);
     // static char buffer[50];
     // memset(buffer,0,50);
@@ -60,7 +55,7 @@ static void handle_transition(state_machine_t* state_obj, const bool heat, const
     // Serial.println(buffer);
     //          Serial.println("heat value");
         //Serial.println((String)(int)heat);
-    Serial.println("git inside handle_transition");
+//Serial.println("git inside handle_transition");
     //Serial.println("heat value is: "+);
     if(!heat && !smoke)return;
 
@@ -79,7 +74,7 @@ static void handle_transition(state_machine_t* state_obj, const bool heat, const
     if (!heat && smoke)
     {
         Serial.println("transition to smoke state is successful");
-        debug_printf("smoke value %d\n",(int)smoke);
+        // debug_printf("smoke value %d\n",(int)smoke);
         //  debug_printf("Heat value %d\n",(int)heat);
         //   debug_printf("smoke value %d\n",(int)smoke);
         //  sprintf(" no heat value %d\n", heat);
@@ -91,7 +86,7 @@ static void handle_transition(state_machine_t* state_obj, const bool heat, const
     
     if (heat && smoke)
     {
-        Serial.println("transition to smoke state is successful");
+       Serial.println("transition to smoke state is successful");
         //  debug_printf("heat value %d\n",(int)heat);
         //   debug_printf("smoke value %d\n",(int)heat);
         //   sprintf("  heat value %d\n", heat);
@@ -106,9 +101,14 @@ static void handle_transition(state_machine_t* state_obj, const bool heat, const
 
 error_type_t state_machine_transition(state_machine_t* state_obj, const bool heat, const bool smoke){
     //change the bool value to const
-    if(state_obj == NULL)return NULL_PARAMETER;
-    if(!state_obj->initialize)return INVALID_STATE;
-
+    if(state_obj == NULL){
+        debug_printf(" state transition is returaning null");
+        return NULL_PARAMETER;
+    }
+    if(!state_obj->initialize){
+        debug_printf(" state transition is returing invalide state");
+        return INVALID_STATE;
+    }
     //   state_t temp = state_obj->current_state;
     handle_transition(state_obj,heat,smoke);
     //   if (temp != state_obj->current_state)

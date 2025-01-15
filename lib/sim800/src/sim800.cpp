@@ -1,6 +1,7 @@
 #include "sim800.h"
 #include <SoftwareSerial.h>
 #include <stdlib.h>
+#include <print.h>
 // #include <Regexp.h>
 #include "common_headers.h"
 #if defined(ARDUINO_AVR_NANO)
@@ -15,7 +16,7 @@ static const uint8_t ACCEPTABLE_RX_PIN[] = {0, 1, 2, 3};
 #define MAX_TIMEOUT (0x10000000UL)
 #define READ_BUFFER_SIZE (127U)
 #define EXTRA_CHAR_COUNT (2U)
-#define MESSAGE_SEND_BUFFER_SIZE (255U)
+#define MESSAGE_SEND_BUFFER_SIZE (127U)
 #define SEND_SMS_DELAY (60000U)
 #define COMMAND_PING ("AT\r\n")
 #define COMMAND_CHECK_SMS_SUPPORT ("AT+CMGF=1\r\n")
@@ -230,6 +231,7 @@ error_type_t sim800_init(sim800_t *sim800_object)
     digitalWrite(sim800_object->rst_pin_number,LOW);
     sim800_object->initialized = true;
     flush_serial();
+    debug_printf("sim800 init is successful");
     return OK;
 }
 
@@ -262,7 +264,7 @@ sim800_t *sim800_create(const sim800_config_t *config)
     new_sim800_obj->rst_pin_number = config->rst_pin_number;
     new_sim800_obj->baud_rate = config->baud_rate;
     new_sim800_obj->initialized = false;
-    // Serial.println("created object sim800");
+    debug_printf("sim800 create is sucessful");
     return new_sim800_obj;
 }
 
@@ -272,8 +274,11 @@ error_type_t sim800_connect(sim800_t *sim800_object)
         return NULL_PARAMETER;
     if (!sim800_object->initialized)
         return INVALID_STATE;
-    if (sim800_serial.serial == NULL)
+    if (sim800_serial.serial == NULL){
+        debug_printf("sim800 serial return null parameter");
         return NULL_PARAMETER;
+    }
+        
     #ifdef PIO_UNIT_TESTING
     return OK;
     #else
@@ -297,16 +302,26 @@ error_type_t sim800_connect(sim800_t *sim800_object)
 }
 error_type_t sim800_send_sms(sim800_t *sim800_object, char *phone_number, char *message)
 {
-    if (sim800_object == NULL || phone_number == NULL || message == NULL)
+    if (sim800_object == NULL || phone_number == NULL || message == NULL){
+    Serial.println(F("sim 800 send sms is returing null parameter"));
+    debug_printf("sim object %p");
+    debug_printf("phone number: %s  and message %s \n",phone_number,message);
+    Serial.println((int)sim800_object); 
         return NULL_PARAMETER;
-    if (!sim800_object->initialized)
+    }
+    if (!sim800_object->initialized){
+      Serial.println(F("sim 800 is not  initialized"));
         return INVALID_STATE;
-    if (sim800_serial.serial == NULL)
+    }
+    if (sim800_serial.serial == NULL){
+      Serial.println(F("sim 800 serial is returing null parameter"));
         return NULL_PARAMETER;
+    }
     flush_serial();
     #ifdef PIO_UNIT_TESTING
     return OK;
     #else
+      Serial.println(F("entering the write and read loop"));
     error_type_t err = write_and_read(COMMAND_SET_GSM, 100);
     if (err != OK)
     {
@@ -316,8 +331,8 @@ error_type_t sim800_send_sms(sim800_t *sim800_object, char *phone_number, char *
     char sms_command_with_number[MESSAGE_SEND_BUFFER_SIZE] = "";
     char sms_term[] = SMS_TERMINATOR;
     COMMAND_CONSTRUCT_SMS_NUMBER(sms_command_with_number, phone_number);
-    Serial.println("constructed message is: ");
-    Serial.println((String)sms_command_with_number);
+    debug_printf("constructed message is: %s\n",sms_command_with_number);
+    //Serial.println((String)sms_command_with_number);
     err = write_and_read(sms_command_with_number, 100, ">");
     if (err != OK)
     {
@@ -326,8 +341,7 @@ error_type_t sim800_send_sms(sim800_t *sim800_object, char *phone_number, char *
     }
     memset(sms_command_with_number, 0, MESSAGE_SEND_BUFFER_SIZE);
     COMMAND_CONSTRUCT_SMS(sms_command_with_number, message, sms_term);
-    Serial.println("constructed message is: ");
-    Serial.println((String)sms_command_with_number);
+    debug_printf("constructed message is: %s\n",sms_command_with_number);
     err = write_and_read(sms_command_with_number, SEND_SMS_DELAY);
     if (err != OK)
     {
@@ -341,12 +355,13 @@ error_type_t sim800_send_sms(sim800_t *sim800_object, char *phone_number, char *
 error_type_t sim800_reset(sim800_t* sim800_object){
     if (!sim800_object->initialized)
     {
-        Serial.println("sim800 could not reset");
+        Serial.println("sim800 could not initalize");
         return INVALID_STATE;
     }
     digitalWrite(sim800_object->rst_pin_number, HIGH);
     delay(2000);
-    digitalWrite(sim800_object->rst_pin_number, LOW);   
+    digitalWrite(sim800_object->rst_pin_number, LOW); 
+    delay(10000);  
     return OK;
 }
 

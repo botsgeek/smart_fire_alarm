@@ -39,8 +39,8 @@ error_type_t mq2_manager_above_threshold(mq2_manager_t* mq2_manager, bool* state
      mq2_analog_read(mq2_manager->mq2_obj, &value);
         if (value > mq2_manager->mq2_threshold)
     {
-        Serial.print("entering the comparing threshold state");
-         debug_printf("above mq2 thres %d\n",(int)*state);
+        // Serial.print("entering the comparing threshold state");
+        //  debug_printf("above mq2 thres %d\n",(int)*state);
         // sprintf(buffer,"above mq2 threshold %d\n",*state);
         //  Serial.print(buffer);
         *state = true;

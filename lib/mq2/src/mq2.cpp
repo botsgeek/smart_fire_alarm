@@ -35,7 +35,7 @@ mq2_t* mq2_create(const mq2_config_t* config){
     new_mq_2_obj->mode = config->mode;
     new_mq_2_obj->initialized = false;
     new_mq_2_obj->has_isr = false;
-    Serial.println("mq2 create completed");
+    //Serial.println("mq2 create completed");
     return new_mq_2_obj;
 }
 
@@ -70,7 +70,7 @@ error_type_t mq2_init(mq2_t* mq2_object){
         if (digital_err != OK) return digital_err;
         digitalRead(mq2_object->analog_pin_number);
         mq2_object->initialized = true;
-        Serial.println("mq2 init is sucessful");
+        //Serial.println("mq2 init is sucessful");
         return OK;
     }
     else return INVALID_PARAMETER;
@@ -127,7 +127,7 @@ error_type_t mq2_analog_read(mq2_t *mq2_object, uint16_t *value_ptr){
     *value_ptr = analogRead(mq2_object->analog_pin_number);
     Serial.print("mq2 value is:");
     Serial.println(*value_ptr);
-    Serial.println("analog reading is sucessful");
+    //Serial.println("analog reading is sucessful");
     return OK;
 }
 error_type_t mq2_digital_read(mq2_t *mq2_object, uint16_t *value_ptr){

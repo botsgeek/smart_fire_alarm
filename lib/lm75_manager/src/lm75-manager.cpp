@@ -37,7 +37,7 @@ error_type_t lm75_manager_above_threshold(lm75_manager_t* lm75_manager, bool* st
     if (lm75_manager == NULL)return NULL_PARAMETER;
     if(!lm75_manager->initialize)return INVALID_STATE;
     float currentTemp = lm75_read(lm75_manager->lm75_obj);
-    Serial.println("temp value is :");
+    Serial.println(F("temp value is :"));
     Serial.println(currentTemp);
     if (currentTemp > lm75_manager->threshold)
     {
