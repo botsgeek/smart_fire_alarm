@@ -89,10 +89,12 @@ extern "C"
     error_type_t lm75_init_comparator_mode(lm75_t* lm75_object);
 
  error_type_t lm75_init_interrupt_mode(lm75_t* lm75_object,void(*lm75_interrupt_handler)());
+ error_type_t lm75_destroy(lm75_t** lm75_object);
 
 
-}
+
 #ifdef __cplusplus
+}
 #endif
 
 #endif

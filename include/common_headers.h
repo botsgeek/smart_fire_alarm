@@ -15,12 +15,22 @@ extern "C"
         INVALID_MODE,
         INVALID_BAUD_RATE,
         INVALID_LENGTH,
+        INVALID_TEMPERATURE,
         TIMED_OUT,
         BUFFER_OVERFLOW,
         UNKNOWN,
         FAILED
 
     } error_type_t;
+
+//     typedef enum{
+//     NORMAL,
+//     ACTIVATE_PUMP,
+//     ACTIVATE_FAN,
+//     DEACTIVATE_DRIVER,
+//     ACTIVATE_BUZZER
+// }state;
+
 #ifdef __cplusplus
 }
 #endif

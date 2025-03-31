@@ -20,6 +20,7 @@ error_type_t set_fanspeed(fan_t* fan_object, uint8_t fanspeed);
 error_type_t deinit(fan_t* fan_object);
 
 fan_t* fan_create(const fan_config_t* config);
+error_type_t destroy(fan_t** fan_object);
 
 
 
